@@ -1,5 +1,14 @@
 from flask import Flask, url_for, jsonify, Response
 app = Flask(__name__)
+import git, os
+
+#periodically do this to get updated schemas
+def gitcheckout():
+    if os.path.isdir('./mozilla-pipeline-schemas'):
+        pass
+    else:
+        git.Git().clone('git@github.com:mozilla-services/mozilla-pipeline-schemas.git')
+
 
 @app.route('/')
 def api_root():
@@ -10,11 +19,13 @@ def api_root():
 def api_get_schema(namespace,docType,version):
     # 1. assemble payload from the parameters
     print "DEBUG: api_get_schema method start"
-    git_url_suffix  = namespace + '/' + docType + '.' + version + '.' + 'schema.json'
+    if version == None:
+        git_url_suffix  = namespace + '/' + docType + '.' + version + '.' + 'schema.json'
     #print 'DEBUG: git_url_suffix: '.append(git_url_suffix)
     # 2. git checkout from the url in the payload
     # alternatively read file from local git repo for now
-    fiFile ='/Users/pswaminathan/git/mozilla-pipeline-schemas/'+git_url_suffix
+    gitcheckout()
+    fiFile ='./mozilla-pipeline-schemas/'+git_url_suffix
     schema_file = open(fiFile)
     
     # 3. jsonify and return schema file
