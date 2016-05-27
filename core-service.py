@@ -1,10 +1,10 @@
+#!/usr/bin/env python
 from flask import Flask, url_for, jsonify, Response
-app = Flask(__name__)
-import git, os
+import os
 
+app = Flask(__name__)
 CWD = os.path.dirname(os.path.realpath(__file__))
-#REMOTE_URL = 'git@github.com:mozilla-services/mozilla-pipeline-schemas.git'
-REMOTE_URL = 'https://github.com/purukaushik/mozilla-pipeline-schemas.git'
+
 
 if not app.debug:
     import logging
@@ -14,14 +14,12 @@ if not app.debug:
     file_handler.setLevel(logging.DEBUG)
     app.logger.addHandler(file_handler)
 
-# TODO : periodically do this to get updated schemas
-def gitcheckout():
-    if os.path.isdir('./mozilla-pipeline-schemas'):
-        print 'DEBUG: directory exists. skipping cloning...'
-        pass
-    else:
-        print 'DEBUG: cloning '+ REMOTE_URL
-        git.Git().clone(REMOTE_URL)
+def get_schema(fileName):
+    print 'DEBUG: json schema full path :' + fileName
+    schema_file = open(fileName)
+    
+    #  _. jsonify and return schema file
+    return schema_file.read()
 
 
 @app.route('/')
@@ -29,30 +27,32 @@ def api_root():
     # TODO : Possibly set usage kinda thing here
     return ''
 
-@app.route('/schema/<namespace>/<docType>/<version>', methods=['GET'])
-def api_get_schema(namespace,docType,version):
-    # 1. assemble payload from the parameters
+# TODO: Unmessify
+@app.route('/schema/<namespace>/<docType>', methods=['GET'])
+def api_get_schema(namespace,docType):
     print "DEBUG: api_get_schema method start"
+    print "DEBUG: assembling fileName from route"
 
-    #if version == None:
     git_url_suffix  = namespace + '/' + docType  + '.' + 'schema.json'
-
-    #TODO : add version logic once gitpython checkout branch is done
-    #else:    
-    #    git_url_suffix = namespace + '/' + docType + '.'+ version +'.' + 'schema.json'
-    #    app.logger.debug( git_url_suffix: '.append(git_url_suffix)
-
-
-    # 2. git checkout from the url in the payload
-    gitcheckout()
-
     fiFile = CWD + '/mozilla-pipeline-schemas/'+git_url_suffix
-    print 'DEBUG: json schema full path :' + fiFile
-    schema_file = open(fiFile)
+
+    print "DEBUG: fetching and reading file: "+ fiFile
+    schema_json = get_schema(fiFile)
+    resp = Response(schema_json, status = 200, mimetype='application/json')
+    return resp
+
+@app.route('/schema/<namespace>/<docType>/<version>', methods=['GET'])
+def api_get_schema_w_version(namespace,docType,version):
+    # _. assemble payload from the parameters
+    print "DEBUG: api_get_schema method start"
+    print "DEBUG: assembling fileName from route"
     
-    # 3. jsonify and return schema file
-    schema_json  = schema_file.read()
-    resp = Response(schema_json, status = 200, mimetype='applciation/json')
+    git_url_suffix = namespace + '/' + docType + '.'+ version +'.' + 'schema.json'
+    fiFile = CWD + '/mozilla-pipeline-schemas/'+git_url_suffix
+
+    print "DEBUG: fetching and reading file: "+ fiFile
+    schema_json = get_schema(fiFile)
+    resp = Response(schema_json, status = 200, mimetype='application/json')
     return resp
     
 
