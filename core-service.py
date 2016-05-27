@@ -33,15 +33,19 @@ def api_root():
 def api_get_schema(namespace,docType,version):
     # 1. assemble payload from the parameters
     print "DEBUG: api_get_schema method start"
+
     #if version == None:
     git_url_suffix  = namespace + '/' + docType  + '.' + 'schema.json'
-    #else:
+
+    #TODO : add version logic once gitpython checkout branch is done
+    #else:    
     #    git_url_suffix = namespace + '/' + docType + '.'+ version +'.' + 'schema.json'
-    #app.logger.debug( git_url_suffix: '.append(git_url_suffix)
+    #    app.logger.debug( git_url_suffix: '.append(git_url_suffix)
+
+
     # 2. git checkout from the url in the payload
-    # alternatively read file from local git repo for now
     gitcheckout()
-    app.logger.debug('Test debug')
+
     fiFile = CWD + '/mozilla-pipeline-schemas/'+git_url_suffix
     print 'DEBUG: json schema full path :' + fiFile
     schema_file = open(fiFile)
