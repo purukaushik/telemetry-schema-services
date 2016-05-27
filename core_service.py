@@ -1,6 +1,7 @@
 #!/usr/bin/env python
-from flask import Flask, url_for, jsonify, Response
-import os
+from flask import Flask, url_for, jsonify,request, Response
+import os, json
+from jsonschema import validate, ValidationError
 
 app = Flask(__name__)
 CWD = os.path.dirname(os.path.realpath(__file__))
@@ -54,7 +55,14 @@ def api_get_schema_w_version(namespace,docType,version):
     schema_json = get_schema(fiFile)
     resp = Response(schema_json, status = 200, mimetype='application/json')
     return resp
-    
+
+
+@app.errorhandler(404)
+def not_found(error=None):
+    message = {
+        'status': 404,
+        'message': 'Not Found: '+ request.url,
+    }
 
 if __name__ == '__main__':
     app.run()
