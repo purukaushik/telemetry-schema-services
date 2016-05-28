@@ -53,8 +53,15 @@ def api_get_schema_w_version(namespace,docType,version):
 
     print "DEBUG: fetching and reading file: "+ fiFile
     schema_json = get_schema(fiFile)
-    resp = Response(schema_json, status = 200, mimetype='application/json')
-    return resp
+
+    if 'json' in request.args:
+        main_schema = json.load(fiFile)
+        resp_str = validate(request.args['json'],main_schema)
+        return Response(validate, status=200, mimetype='application/json')
+    else:
+        resp = Response(schema_json, status = 200, mimetype='application/json')
+        return resp
+
 
 
 @app.errorhandler(404)
