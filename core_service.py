@@ -56,8 +56,19 @@ def api_get_schema_w_version(namespace,docType,version):
 
     if 'json' in request.args:
         main_schema = json.load(fiFile)
-        resp_str = validate(request.args['json'],main_schema)
-        return Response(validate, status=200, mimetype='application/json')
+        try:
+            validate(request.args['json'],main_schema)
+            resp_str = {
+                'status' : 200,
+                'message' : 'json ok!'
+            }
+            return Response(resp_str, status=200, mimetype='application/json')
+        except ValidationError:
+            message = {
+                'status': 500,
+                'message': 'Invalid Json payload'
+            } 
+            return Response(message,status=500, mimetype='application/json')
     else:
         resp = Response(schema_json, status = 200, mimetype='application/json')
         return resp
