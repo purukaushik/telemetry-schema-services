@@ -18,7 +18,6 @@ if not app.debug:
 def get_schema(fileName):
     print 'DEBUG: json schema full path :' + fileName
     schema_file = open(fileName)
-    
     #  _. jsonify and return schema file
     return schema_file.read()
 
@@ -42,7 +41,7 @@ def api_get_schema(namespace,docType):
     resp = Response(schema_json, status = 200, mimetype='application/json')
     return resp
 
-@app.route('/schema/<namespace>/<docType>/<version>', methods=['GET'])
+@app.route('/schema/<namespace>/<docType>/<version>', methods=['GET', 'POST'])
 def api_get_schema_w_version(namespace,docType,version):
     # _. assemble payload from the parameters
     print "DEBUG: api_get_schema method start"
@@ -54,22 +53,28 @@ def api_get_schema_w_version(namespace,docType,version):
     print "DEBUG: fetching and reading file: "+ fiFile
     schema_json = get_schema(fiFile)
 
-    if 'json' in request.args:
+    if request.method == 'POST':
         main_schema = json.load(fiFile)
-        try:
-            validate(request.args['json'],main_schema)
-            resp_str = {
-                'status' : 200,
-                'message' : 'json ok!'
-            }
-            return Response(resp_str, status=200, mimetype='application/json')
-        except ValidationError:
-            message = {
-                'status': 500,
-                'message': 'Invalid Json payload'
-            } 
-            return Response(message,status=500, mimetype='application/json')
-    else:
+        # handle POST - i.e validation of json
+        if request.headers['Content-Type'] == 'application/json':
+            try:
+                validate(json.dumps(request.json), main_schema)
+                resp_str = {
+                    'status' : 200,
+                    'message' : 'json ok!'
+                }
+                return Response(resp_str, status=200, mimetype='application/json')
+            except ValidationError:
+                message = {
+                    'status': 500,
+                    'message': 'Invalid Json payload'
+                }
+                return Response(message,status=500, mimetype='application/json')
+        else:
+            pass
+        # TODO : handle GZIP
+    elif request.method == 'GET':
+        # handle GET - i.e return schema requested
         resp = Response(schema_json, status = 200, mimetype='application/json')
         return resp
 
