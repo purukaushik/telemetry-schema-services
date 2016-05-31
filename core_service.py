@@ -10,7 +10,7 @@ CWD = os.path.dirname(os.path.realpath(__file__))
 if not app.debug:
     import logging
     from logging import FileHandler
-    #handle backing server.log file in a deploy script ??
+    #TODO : change to rotating file handler thing
     file_handler = FileHandler('server.log')
     file_handler.setLevel(logging.DEBUG)
     app.logger.addHandler(file_handler)
@@ -19,7 +19,7 @@ def get_schema(fileName):
     print 'DEBUG: json schema full path :' + fileName
     schema_file = open(fileName)
     #  _. jsonify and return schema file
-    return schema_file.read()
+    return schema_file
 
 
 @app.route('/')
@@ -54,24 +54,24 @@ def api_get_schema_w_version(namespace,docType,version):
     schema_json = get_schema(fiFile)
 
     if request.method == 'POST':
-        main_schema = json.load(fiFile)
+        main_schema = json.load(schema_json)
         # handle POST - i.e validation of json
         if request.headers['Content-Type'] == 'application/json':
             try:
-                validate(json.dumps(request.json), main_schema)
+                validate(request.json, main_schema)
                 resp_str = {
-                    'status' : 200,
-                    'message' : 'json ok!'
+                    "status" : 200,
+                    "message" : "json ok!"
                 }
                 return Response(resp_str, status=200, mimetype='application/json')
             except ValidationError:
                 message = {
-                    'status': 500,
-                    'message': 'Invalid Json payload'
+                    "status": 500,
+                    "message": "Invalid Json payload"
                 }
                 return Response(message,status=500, mimetype='application/json')
         else:
-            pass
+            return Response('Error: Gzip not handled yet', status=500, mimetype='application/text')
         # TODO : handle GZIP
     elif request.method == 'GET':
         # handle GET - i.e return schema requested
