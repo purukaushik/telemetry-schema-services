@@ -28,18 +28,18 @@ def api_root():
     return ''
 
 # TODO: Unmessify
-@app.route('/schema/<namespace>/<docType>', methods=['GET'])
-def api_get_schema(namespace,docType):
-    print "DEBUG: api_get_schema method start"
-    print "DEBUG: assembling fileName from route"
-
-    git_url_suffix  = namespace + '/' + docType  + '.' + 'schema.json'
-    fiFile = CWD + '/mozilla-pipeline-schemas/'+git_url_suffix
-
-    print "DEBUG: fetching and reading file: "+ fiFile
-    schema_json = get_schema(fiFile)
-    resp = Response(schema_json, status = 200, mimetype='application/json')
-    return resp
+#@app.route('/schema/<namespace>/<docType>', methods=['GET'])
+#def api_get_schema(namespace,docType):
+#    print "DEBUG: api_get_schema method start"
+#    print "DEBUG: assembling fileName from route"
+#
+#    git_url_suffix  = namespace + '/' + docType  + '.' + 'schema.json'
+#    fiFile = CWD + '/mozilla-pipeline-schemas/'+git_url_suffix
+#
+#    print "DEBUG: fetching and reading file: "+ fiFile
+#    schema_json = get_schema(fiFile)
+#    resp = Response(schema_json, status = 200, mimetype='application/json')
+#    return resp
 
 @app.route('/schema/<namespace>/<docType>/<version>', methods=['GET', 'POST'])
 def api_get_schema_w_version(namespace,docType,version):
@@ -63,13 +63,13 @@ def api_get_schema_w_version(namespace,docType,version):
                     "status" : 200,
                     "message" : "json ok!"
                 }
-                return Response(resp_str, status=200, mimetype='application/json')
+                return Response(json.dumps(resp_str), status=200, mimetype='application/json')
             except ValidationError:
                 message = {
                     "status": 500,
                     "message": "Invalid Json payload"
                 }
-                return Response(message,status=500, mimetype='application/json')
+                return Response(json.dumps(message),status=500, mimetype='application/json')
         else:
             return Response('Error: Gzip not handled yet', status=500, mimetype='application/text')
         # TODO : handle GZIP
