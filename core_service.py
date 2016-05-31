@@ -25,7 +25,7 @@ def get_schema(fileName):
 @app.route('/')
 def api_root():
     # TODO : Possibly set usage kinda thing here
-    return ''
+    return Response(open('README.md').read(), status=200, mimetype='application/text')
 
 # TODO: Unmessify
 #@app.route('/schema/<namespace>/<docType>', methods=['GET'])
