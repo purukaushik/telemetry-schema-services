@@ -58,26 +58,26 @@ def api_get_schema_w_version(namespace,docType,version):
     schema_json = get_schema_json(namespace,docType,version)
     if request.method == 'POST':
         main_schema = json.load(schema_json)
-        print "is POST"
+        print "DEBUG: request is POST"
         # handle POST - i.e validation of json
         if request.headers['Content-Type'] == 'application/json':
             try:
-                print "try'na validate"
+                print "DEBUG: try'na validate"
                 validate(request.json, main_schema)
                 resp_str = {
                     "status" : 200,
                     "message" : "json ok!"
                 }
                 return Response(json.dumps(resp_str), status=200, mimetype='application/json')
-            except ValidationError:
+            except ValidationError as e:
                 message = {
-                    "status": 500,
-                    "message": "Invalid Json payload"
+                    "status": 400,
+                    "message": unicode(e)
                 }
-                return Response(json.dumps(message),status=500, mimetype='application/json')
+                return Response(json.dumps(message),status=400, mimetype='application/json')
         elif request.headers['Content-Type'] == 'application/gzip':
             # TODO : handle GZIP
-            print "no gzip yet"
+            print "DEBUG: no gzip yet"
             return Response('Error: Gzip not handled yet', status=500, mimetype='application/text')
         else:
             if 'file' not in request.files:
@@ -106,11 +106,11 @@ def api_get_schema_w_version(namespace,docType,version):
             except ValidationError as e:
                 print str(e)
                 message = {
-                    "status": 500,
-                    "message": str(e)
+                    "status": 400,
+                    "message": unicode(e)
                 }
                 print "Invalid JSON sent."
-                return Response(json.dumps(message),status=500, mimetype='application/json')
+                return Response(json.dumps(message),status=400, mimetype='application/json')
 
     elif request.method == 'GET':
         # handle GET - i.e return schema requested
