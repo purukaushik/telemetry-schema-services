@@ -27,26 +27,14 @@ def api_root():
     # TODO : Possibly set usage kinda thing here
     return Response(open('README.md').read(), status=200, mimetype='application/text')
 
-# TODO: Unmessify
-#@app.route('/schema/<namespace>/<docType>', methods=['GET'])
-#def api_get_schema(namespace,docType):
-#    print "DEBUG: api_get_schema method start"
-#    print "DEBUG: assembling fileName from route"
-#
-#    git_url_suffix  = namespace + '/' + docType  + '.' + 'schema.json'
-#    fiFile = CWD + '/mozilla-pipeline-schemas/'+git_url_suffix
-#
-#    print "DEBUG: fetching and reading file: "+ fiFile
-#    schema_json = get_schema(fiFile)
-#    resp = Response(schema_json, status = 200, mimetype='application/json')
-#    return resp
 
 @app.route('/schema/<namespace>/<docType>/<version>', methods=['GET', 'POST'])
 def api_get_schema_w_version(namespace,docType,version):
     # _. assemble payload from the parameters
     print "DEBUG: api_get_schema method start"
     print "DEBUG: assembling fileName from route"
-    
+    # construct file name from GET uri and search for schema in cwd/mozilla-pipeline-schemas/
+    # assumes git clones into cwd 
     git_url_suffix = namespace + '/' + docType + '.'+ version +'.' + 'schema.json'
     fiFile = CWD + '/mozilla-pipeline-schemas/'+git_url_suffix
 
