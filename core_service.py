@@ -1,11 +1,20 @@
 #!/usr/bin/env python
-from flask import Flask, url_for, jsonify,request, Response
+from flask import Flask, url_for, jsonify,request, Response, redirect,send_from_directory
 import os, json
 from jsonschema import validate, ValidationError
+from werkzeug.utils import secure_filename
+
+
+CWD = os.path.dirname(os.path.realpath(__file__))
+UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__name__))+ '/uploads/'
+ALLOWED_EXTENSIONS= set(['json'])
 
 app = Flask(__name__)
-CWD = os.path.dirname(os.path.realpath(__file__))
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.',1)[1] in ALLOWED_EXTENSIONS
 
 if not app.debug:
     import logging
@@ -21,31 +30,39 @@ def get_schema(fileName):
     #  _. jsonify and return schema file
     return schema_file
 
+def get_schema_json(namespace,docType,version):
+    git_url_suffix = namespace + '/' + docType + '.'+ version +'.' + 'schema.json'
+    fiFile = CWD + '/mozilla-pipeline-schemas/'+git_url_suffix
+
+    print "DEBUG: fetching and reading file: "+ fiFile
+    schema_json = get_schema(fiFile)
+    return schema_json
 
 @app.route('/')
 def api_root():
     # TODO : Possibly set usage kinda thing here
     return Response(open('README.md').read(), status=200, mimetype='application/text')
 
+@app.route('/schema/<namespace>/<docType>/<version>', methods=['GET'])
+def api_get_schema(namespace,docType,version):
+    resp = Response(get_schema_json(namespace,docType,version), status = 200, mimetype='application/json')
+    return resp
 
-@app.route('/schema/<namespace>/<docType>/<version>', methods=['GET', 'POST'])
+@app.route('/validate/<namespace>/<docType>/<version>', methods=['GET', 'POST'])
 def api_get_schema_w_version(namespace,docType,version):
     # _. assemble payload from the parameters
     print "DEBUG: api_get_schema method start"
     print "DEBUG: assembling fileName from route"
     # construct file name from GET uri and search for schema in cwd/mozilla-pipeline-schemas/
     # assumes git clones into cwd 
-    git_url_suffix = namespace + '/' + docType + '.'+ version +'.' + 'schema.json'
-    fiFile = CWD + '/mozilla-pipeline-schemas/'+git_url_suffix
-
-    print "DEBUG: fetching and reading file: "+ fiFile
-    schema_json = get_schema(fiFile)
-
+    schema_json = get_schema_json(namespace,docType,version)
     if request.method == 'POST':
         main_schema = json.load(schema_json)
+        print "is POST"
         # handle POST - i.e validation of json
         if request.headers['Content-Type'] == 'application/json':
             try:
+                print "try'na validate"
                 validate(request.json, main_schema)
                 resp_str = {
                     "status" : 200,
@@ -58,13 +75,52 @@ def api_get_schema_w_version(namespace,docType,version):
                     "message": "Invalid Json payload"
                 }
                 return Response(json.dumps(message),status=500, mimetype='application/json')
-        else:
+        elif request.headers['Content-Type'] == 'application/gzip':
+            # TODO : handle GZIP
+            print "no gzip yet"
             return Response('Error: Gzip not handled yet', status=500, mimetype='application/text')
-        # TODO : handle GZIP
+        else:
+            if 'file' not in request.files:
+                flash('No file part')
+                return redirect(request.url)
+
+            file = request.files['file']
+            if file.filename == '' :
+                flash('No selected file')
+                return redirect(request.url)
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            try:
+                print "before checking request json"
+                #REMEMBER THIS FOREVER!
+                with open(UPLOAD_FOLDER+filename) as file:
+                    validate(json.load(file), main_schema)
+                print "after checking request.json"
+                resp_str = {
+                    "status" : 200,
+                    "message" : "json ok!"
+                }
+                print "JSON Ok!"
+                return Response(json.dumps(resp_str), status=200, mimetype='application/json')
+            except ValidationError as e:
+                print str(e)
+                message = {
+                    "status": 500,
+                    "message": str(e)
+                }
+                print "Invalid JSON sent."
+                return Response(json.dumps(message),status=500, mimetype='application/json')
+
     elif request.method == 'GET':
         # handle GET - i.e return schema requested
-        resp = Response(schema_json, status = 200, mimetype='application/json')
-        return resp
+        # File handler here
+        return '''
+        <!doctype html>
+        <title>Upload new file</title>
+        <h1>Upload new file</h1>
+        <form action="" method=post enctype=multipart/form-data>
+        <p><input type =file name=file><input type=submit value="upload and validate"></form>'''
 
 
 
