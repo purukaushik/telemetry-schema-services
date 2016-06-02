@@ -88,29 +88,31 @@ def api_get_schema_w_version(namespace,docType,version):
                 flash('No selected file')
                 return redirect(request.url)
             if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            try:
-                print "before checking request json"
-                #REMEMBER THIS FOREVER!
-                with open(UPLOAD_FOLDER+filename) as file:
+                try:
+                    print "before checking request json"
                     validate(json.load(file), main_schema)
-                print "after checking request.json"
-                resp_str = {
-                    "status" : 200,
-                    "message" : "json ok!"
-                }
-                print "JSON Ok!"
-                return Response(json.dumps(resp_str), status=200, mimetype='application/json')
-            except ValidationError as e:
-                print str(e)
-                message = {
-                    "status": 400,
-                    "message": unicode(e)
-                }
-                print "Invalid JSON sent."
-                return Response(json.dumps(message),status=400, mimetype='application/json')
-
+                    print "after checking request.json"
+                    resp_str = {
+                        "status" : 200,
+                        "message" : "json ok!"
+                    }
+                    print "JSON Ok!"
+                    return Response(json.dumps(resp_str), status=200, mimetype='application/json')
+                except ValidationError as e:
+                    print str(e)
+                    message = {
+                        "status": 400,
+                        "message": unicode(e)
+                    }
+                    print "Invalid JSON sent."
+                    return Response(json.dumps(message),status=400, mimetype='application/json')
+            else:
+                 message={
+                     "status": 400,
+                     "message": "File not a json"
+                 }
+                 print "Not a JSON"
+                 return Response(json.dumps(message), status = 400, mimetype='application/json')
     elif request.method == 'GET':
         # handle GET - i.e return schema requested
         # File handler here
