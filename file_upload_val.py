@@ -11,9 +11,9 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 if not app.debug:
     import logging
-    from logging import FileHandler
+    from logging.handlers import RotatingFileHandler
     #TODO : change to rotating file handler thing
-    file_handler = FileHandler('server.log')
+    file_handler = RotatingFileHandler('server.log',mode='a',maxBytes=1024000 )
     file_handler.setLevel(logging.DEBUG)
     app.logger.addHandler(file_handler)
 
@@ -27,20 +27,20 @@ def uploaded_file(filename):
     with open('test_schema.json') as schema:
         schemaJson = json.load(schema)
         try:
-            print "before checking request json"
+            app.logger.debug("Before checking request json")
             
             #REMEMBER THIS FOREVER!
             with open(UPLOAD_FOLDER+filename) as file:
                 validate(json.load(file), schemaJson)
-            print "after checking request.json"
+            app.logger.debug("after checking request.json")
             resp_str = {
                 "status" : 200,
                 "message" : "json ok!"
             }
-            print "JSON Ok!"
+            app.logger.debug("JSON Ok!")
             return Response(json.dumps(resp_str), status=200, mimetype='application/json')
         except ValidationError as e:
-            print str(e)
+            app.logger.error(str(e))
             message = {
                 "status": 500,
                 "message": str(e)
