@@ -3,7 +3,7 @@ from flask import Flask, url_for, jsonify,request, Response, redirect,send_from_
 import os, json
 from jsonschema import validate, ValidationError
 from werkzeug.utils import secure_filename
-
+from git_checkout import gitcheckout
 
 CWD = os.path.dirname(os.path.realpath(__file__))
 UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__name__))+ '/uploads/'
@@ -40,8 +40,7 @@ def get_schema_json(namespace,docType,version):
 
 @app.route('/')
 def api_root():
-    # TODO : Possibly set usage kinda thing here
-    return Response(open('README.md').read(), status=200, mimetype='application/text')
+    return Response(open('README.md').read(), status=200, mimetype='text/plain')
 
 @app.route('/schema/<namespace>/<docType>/<version>', methods=['GET'])
 def api_get_schema(namespace,docType,version):
@@ -132,4 +131,5 @@ def not_found(error=None):
     }
 
 if __name__ == '__main__':
+    gitcheckout()
     app.run()
