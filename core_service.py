@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-from flask import Flask, url_for, jsonify,request, Response, redirect,send_from_directory
+from flask import Flask, request, Response, redirect
 import os, json
 from jsonschema import validate, ValidationError
-from werkzeug.utils import secure_filename
 from git_checkout import gitcheckout
+import gzip, StringIO
 
 CWD = os.path.dirname(os.path.realpath(__file__))
 UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__name__))+ '/uploads/'
@@ -74,10 +74,25 @@ def api_get_schema_w_version(namespace,docType,version):
                     "message": unicode(e)
                 }
                 return Response(json.dumps(message),status=400, mimetype='application/json')
-        elif request.headers['Content-Type'] == 'application/gzip':
-            # TODO : handle GZIP
-            print "DEBUG: no gzip yet"
-            return Response('Error: Gzip not handled yet', status=500, mimetype='application/text')
+        elif request.headers['Content-Type'] == 'application/x-gzip':
+            print "DEBUG: Gzip option"
+            file = StringIO.StringIO(request.data)
+            ungzip = gzip.GzipFile(fileobj = file,mode ='rb')
+            file_content = ungzip.read()
+            try:
+                validate(json.loads(file_content),main_schema)
+                resp_str = {
+                    "status": 200,
+                    "message" : "json ok!"
+                }
+                return Response(json.dumps(resp_str), status=200, mimetype='application/json')
+            except ValidationError as e:
+                print "ERROR: validationError : " + unicode(e)
+                message = {
+                    "status": 400,
+                    "message": unicode(e)
+                }
+                return Response(json.dumps(message),status=400, mimetype='application/json')
         else:
             if 'file' not in request.files:
                 flash('No file part')
@@ -131,7 +146,7 @@ def not_found(error=None):
         'status': 404,
         'message': 'Not Found: '+ request.url,
     }
-
+    return Response(json.dumps(message), status=404, mimetype='application/json')
 if __name__ == '__main__':
     gitcheckout()
     app.run()
