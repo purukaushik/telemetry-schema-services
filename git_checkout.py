@@ -27,7 +27,7 @@ def gitcheckout():
         print 'DEBUG: done pulling'
         headcommit = repo.head.commit
         import datetime
-        commit_msg = repr(headcommit.branch) + "  " + repr(headcommit.author) + "  " + datetime.datetime.fromtimestamp(int(headcommit.authored_date)).strftime('%Y-%m-%d %H:%M:%S') +  "  " + headcommit.message 
+        commit_msg = repr(headcommit.author) + "  " + datetime.datetime.fromtimestamp(int(headcommit.authored_date)).strftime('%Y-%m-%d %H:%M:%S') +  "  " + headcommit.message 
         print 'DEBUG: latest commit: ' + commit_msg
         pass
     else:
