@@ -31,7 +31,13 @@ def get_schema(fileName):
     return schema_file
 
 def get_schema_json(namespace,docType,version):
-    git_url_suffix = namespace + '/' + docType + '.'+ version +'.' + 'schema.json'
+
+    git_url_suffix = namespace + '/' + docType
+    # HOTFIX: until we include version number in schema file
+    if version == '0':
+        git_url_suffix= git_url_suffix+ '.' + 'schema.json'
+    else:
+        git_url_suffix= git_url_suffix+ '.' + version +'.'+ 'schema.json'
     fiFile = CWD + '/mozilla-pipeline-schemas/'+git_url_suffix
 
     print "DEBUG: fetching and reading file: "+ fiFile
