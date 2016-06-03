@@ -17,9 +17,9 @@ Currently only configured to run on port 5000.
   
   e.g telemetry/main/4 refers to the main.4.schema.json located in telemetry/ folder.
   
-Retrieve a schema:
-  
-  * To retrieve a schema version, say - telemetry/main.4.schema.json (from the github repo):
+
+  * Retrieve a schema:
+     To retrieve a schema version, say - telemetry/main.4.schema.json (from the github repo):
 
         $ curl -i http://127.0.0.1:5000/schema/telemetry/main/4
    
