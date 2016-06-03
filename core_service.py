@@ -12,6 +12,10 @@ ALLOWED_EXTENSIONS= set(['json'])
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+def throw_validation_error(validationError):
+    print str(validationError)
+    return Response(validationError,status=400, mimetype='text/html')    
+
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.',1)[1] in ALLOWED_EXTENSIONS
@@ -75,11 +79,7 @@ def api_get_schema_w_version(namespace,docType,version):
                 }
                 return Response(json.dumps(resp_str), status=200, mimetype='application/json')
             except ValidationError as e:
-                message = {
-                    "status": 400,
-                    "message": unicode(e)
-                }
-                return Response(json.dumps(message),status=400, mimetype='application/json')
+                return throw_validation_error(e)
         elif request.headers['Content-Type'] == 'application/x-gzip':
             print "DEBUG: Gzip option"
             file = StringIO.StringIO(request.data)
@@ -93,12 +93,7 @@ def api_get_schema_w_version(namespace,docType,version):
                 }
                 return Response(json.dumps(resp_str), status=200, mimetype='application/json')
             except ValidationError as e:
-                print "ERROR: validationError : " + unicode(e)
-                message = {
-                    "status": 400,
-                    "message": unicode(e)
-                }
-                return Response(json.dumps(message),status=400, mimetype='application/json')
+                return throw_validation_error(e)
         else:
             if 'file' not in request.files:
                 flash('No file part')
@@ -120,13 +115,7 @@ def api_get_schema_w_version(namespace,docType,version):
                     print "JSON Ok!"
                     return Response(json.dumps(resp_str), status=200, mimetype='application/json')
                 except ValidationError as e:
-                    print str(e)
-                    message = {
-                        "status": 400,
-                        "message": unicode(e)
-                    }
-                    print "Invalid JSON sent."
-                    return Response(json.dumps(message),status=400, mimetype='application/json')
+                    return throw_validation_error(e)
             else:
                  message={
                      "status": 400,
