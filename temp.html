@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+<title>*markdown-output*</title>
+
+</head>
+
+<body>
+
+<h1 id="telemetry-schema-services">telemetry-schema-services</h1>
+<p>Service API to retrieve telemetry schemas and validate them against incoming json.</p>
+<h2 id="running-the-service">Running the service</h2>
+<p>In order to run the service use:</p>
+<pre><code>$ python core_service.py</code></pre>
+<p>Currently only configured to run on port 5000.</p>
+<h2 id="usage">Usage</h2>
+<p>Schemas are retrieved from <a href="https://github.com/mozilla-services/mozilla-pipeline-schemas">this github repo</a></p>
+<p>In general, the uri &lt;-&gt; schema name mapping is: <namespace>/<doctype>/<version> translates to namespace/doctype.version.schema.json</p>
+<p>e.g telemetry/main/4 refers to the main.4.schema.json located in telemetry/ folder.</p>
+<p>Retrieve a schema:</p>
+<ul>
+<li><p>To retrieve a schema version, say - telemetry/main.4.schema.json (from the github repo):</p>
+<pre><code>$ curl -i http://127.0.0.1:5000/schema/telemetry/main/4</code></pre></li>
+<li>Validate a JSON payload via POST:
+<ul>
+<li>To validate a JSON payload with a particular version schema, send a POST with same uri as the schema GET request:</li>
+</ul>
+<code>$ curl -iH &quot;Content-type: application/json&quot; -X POST http://127.0.0.1:5000/validate/telemetry/main/4 --data @sample_v4_ping.json</code>
+<ul>
+<li><p>To use the file upload utility:</p>
+<pre><code>http://127.0.0.1:5000/validate/telemetry/main/4</code></pre>
+<p>will pull up the file upload screen:</p>
+<p>On clicking 'upload and validate' the service will POST the uploaded json and validate it with the schema specified in the uri.</p></li>
+</ul></li>
+</ul>
+
+</body>
+</html>
