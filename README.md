@@ -13,7 +13,7 @@ Currently only configured to run on port 5000.
   
   
   In general, the uri <-> schema name mapping is:
-  <namespace>/<doctype>/<version> translates to namespace/doctype.version.schema.json
+  &lt;namespace&gt;/&lt;doctype&gt;/&lt;version&gt; translates to namespace/doctype.version.schema.json
   
   e.g telemetry/main/4 refers to the main.4.schema.json located in telemetry/ folder.
   
