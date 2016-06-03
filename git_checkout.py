@@ -23,7 +23,7 @@ def gitcheckout():
         repo = git.Repo.init('./mozilla-pipeline-schemas')
         origin = repo.remotes.origin
         fetch_info = origin.fetch(config['branch'])
-        origin.pull()
+        origin.pull(config['branch'])
         print 'DEBUG: done pulling'
         headcommit = repo.head.commit
         import datetime
