@@ -1,9 +1,11 @@
 #!/usr/bin/env python
-from flask import Flask, request, Response, redirect
+from flask import Flask, request, Response, redirect, render_template
 import os, json
+from os.path import isfile,join
 from jsonschema import validate, ValidationError
 from git_checkout import gitcheckout
 import gzip, StringIO
+import re
 
 CWD = os.path.dirname(os.path.realpath(__file__))
 UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__name__))+ '/uploads/'
@@ -48,14 +50,45 @@ def get_schema_json(namespace,docType,version):
     schema_json = get_schema(fiFile)
     return schema_json
 
+def get_doctypes_versions(namespace, docType):
+    path_of_namespace = CWD + '/mozilla-pipeline-schemas/' + namespace
+    files = [f for f in os.listdir(path_of_namespace) if isfile(join(path_of_namespace,f))]
+    lst = list()
+
+    if docType== None:
+        for file in files:
+            m = re.search('^[A-Za-z]*\.', file)
+            docType = m.group().replace('.','')
+            lst_item = (docType, '/schema/'+namespace+'/'+docType)
+            lst.append(lst_item)
+    else:
+        for file in files:
+            print "DEBUG: looking at : " + file
+            m = re.search('^' + docType+'\.'+'([0-9])\.',file)
+            if m is not None:
+                version = m.group(1).replace('.','')
+                lst_item = (version,'/schema/'+namespace+'/'+ docType +'/'+version)
+                lst.append(lst_item)
+    return lst
 @app.route('/')
 def api_root():
     return Response(open('README.md').read(), status=200, mimetype='text/plain')
+
+@app.route('/schema/<namespace>', methods=['GET'])
+def api_get_doctypes(namespace):
+    lst = get_doctypes_versions(namespace, None)    
+    return render_template('links.html', duct_tape=lst)
+
+@app.route('/schema/<namespace>/<docType>', methods=['GET'])
+def api_get_versions(namespace,docType):
+    lst = get_doctypes_versions(namespace,docType)
+    return render_template('links.html', duct_tape=lst)
 
 @app.route('/schema/<namespace>/<docType>/<version>', methods=['GET'])
 def api_get_schema(namespace,docType,version):
     resp = Response(get_schema_json(namespace,docType,version), status = 200, mimetype='application/json')
     return resp
+
 
 @app.route('/validate/<namespace>/<docType>/<version>', methods=['GET', 'POST'])
 def api_get_schema_w_version(namespace,docType,version):
