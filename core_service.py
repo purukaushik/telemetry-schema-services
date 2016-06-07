@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from flask import Flask, request, Response, redirect, render_template
+from flask import Flask, request, Response, redirect, render_template, flash
 import os, json
 from os.path import isfile,join
 from jsonschema import validate, ValidationError
@@ -129,13 +129,12 @@ def api_get_schema_w_version(namespace,docType,version):
                 return throw_validation_error(e)
         else:
             if 'file' not in request.files:
-                flash('No file part')
-                return redirect(request.url)
-
+                error = 'There was an error processing your file. Please try again.'
+                return render_template('file_upload.html',error=error)
             file = request.files['file']
             if file.filename == '' :
-                flash('No selected file')
-                return redirect(request.url)
+                error = 'No file uploaded. Please select a json file to continue.'
+                return render_template('file_upload.html', error=error)
             if file and allowed_file(file.filename):
                 try:
                     print "before checking request json"
@@ -159,13 +158,7 @@ def api_get_schema_w_version(namespace,docType,version):
     elif request.method == 'GET':
         # handle GET - i.e return schema requested
         # File handler here
-        return '''
-        <!doctype html>
-        <title>Upload new file</title>
-        <h1>Upload new file</h1>
-        <form action="" method=post enctype=multipart/form-data>
-        <p><input type =file name=file><input type=submit value="upload and validate"></form>'''
-
+        return render_template('file_upload.html')
 
 
 @app.errorhandler(404)

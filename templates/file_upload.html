@@ -1,0 +1,12 @@
+<!doctype html>
+<title>Upload and Validate JSON Payload</title>
+<h1>Upload and Validate JSON Payload</h1>
+{% if error %}
+<p> <strong> ERROR: </strong> {{error}}</p>
+{% endif %}
+<Form action="" method=post enctype=multipart/form-data>
+  <p>
+    <input type =file name=file>
+    <input type=submit value="upload and validate">
+</form>
+
