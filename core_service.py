@@ -59,7 +59,7 @@ def get_doctypes_versions(namespace, docType):
         for file in files:
             m = re.search('^[A-Za-z]*\.', file)
             docType = m.group().replace('.','')
-            lst_item = (docType, '/schema/'+namespace+'/'+docType)
+            lst_item = (docType, '/schema/'+namespace+'/'+docType, None)
             lst.append(lst_item)
     else:
         for file in files:
@@ -67,7 +67,7 @@ def get_doctypes_versions(namespace, docType):
             m = re.search('^' + docType+'\.'+'([0-9])\.',file)
             if m is not None:
                 version = m.group(1).replace('.','')
-                lst_item = (version,'/schema/'+namespace+'/'+ docType +'/'+version)
+                lst_item = (version,'/schema/'+namespace+'/'+ docType +'/'+version, '/validate/'+namespace+"/"+docType+"/"+version)
                 lst.append(lst_item)
     return lst
 @app.route('/')

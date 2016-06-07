@@ -1,4 +1,9 @@
 <h2>{{listing}}<br/></h2>
-{% for name,href in duct_tape %}
-    <a href="{{href}}">{{name}}</a><br/>
+{% for name,schema,validate in duct_tape %}
+<p>{{name}}  <a href="{{schema}}">schema</a>
+
+  {% if validate is not none %}
+  <a href="{{validate}}">validate</a><br/>
+  {% endif %}
+</p>
 {% endfor %}
