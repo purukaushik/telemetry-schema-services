@@ -177,4 +177,4 @@ def not_found(error=None):
     return Response(json.dumps(message), status=404, mimetype='application/json')
 if __name__ == '__main__':
     gitcheckout()
-    app.run()
+    app.run(host='0.0.0.0', port=8080)
