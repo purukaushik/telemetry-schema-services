@@ -77,12 +77,12 @@ def api_root():
 @app.route('/schema/<namespace>', methods=['GET'])
 def api_get_doctypes(namespace):
     lst = get_doctypes_versions(namespace, None)    
-    return render_template('links.html', duct_tape=lst)
+    return render_template('links.html', duct_tape=lst, listing='docTypes under '+ namespace)
 
 @app.route('/schema/<namespace>/<docType>', methods=['GET'])
 def api_get_versions(namespace,docType):
     lst = get_doctypes_versions(namespace,docType)
-    return render_template('links.html', duct_tape=lst)
+    return render_template('links.html', duct_tape=lst, listing='versions of '+ docType)
 
 @app.route('/schema/<namespace>/<docType>/<version>', methods=['GET'])
 def api_get_schema(namespace,docType,version):
