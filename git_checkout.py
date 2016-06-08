@@ -8,7 +8,7 @@ import git, os
 
 #-----GIT CONFIG-----
 config = {
-    "remote_url": "https://github.com/mreid-moz/mozilla-pipeline-schemas.git",
+    "remote_url": "https://github.com/purukaushik/mozilla-pipeline-schemas.git",
     "branch" : "common", #default -master
     "os_dir" : "./mozilla-pipeline-schemas"
 }

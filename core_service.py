@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from flask import Flask, request, Response, redirect, render_template, flash
+from flask import Flask, request, Response, redirect, render_template, flash, send_from_directory
 import os, json
 from os.path import isfile,join
 from jsonschema import validate, ValidationError
@@ -73,6 +73,11 @@ def get_doctypes_versions(namespace, docType):
 @app.route('/')
 def api_root():
     return Response(open('README.md').read(), status=200, mimetype='text/plain')
+
+
+@app.route('/file/<path:path>', methods=['GET'])
+def api_get_file(path):
+    return send_from_directory(CWD+ '/mozilla-pipeline-schemas/', path)
 
 @app.route('/schema/<namespace>', methods=['GET'])
 def api_get_doctypes(namespace):
