@@ -22,17 +22,25 @@ def gitcheckout():
         print 'DEBUG: directory exists. will pull instead of clone...'
         repo = git.Repo.init('./mozilla-pipeline-schemas')
         origin = repo.remotes.origin
-        fetch_info = origin.fetch(config['branch'])
-        origin.pull(config['branch'])
-        print 'DEBUG: done pulling'
-        headcommit = repo.head.commit
-        import datetime
-        commit_msg = repr(headcommit.author) + "  " + datetime.datetime.fromtimestamp(int(headcommit.authored_date)).strftime('%Y-%m-%d %H:%M:%S') +  "  " + headcommit.message 
-        print 'DEBUG: latest commit: ' + commit_msg
-        pass
+        try:
+            fetch_info = origin.fetch(config['branch'])
+            origin.pull(config['branch'])
+            print 'DEBUG: done pulling'
+            headcommit = repo.head.commit
+            import datetime
+            commit_msg = repr(headcommit.author) + "  " + datetime.datetime.fromtimestamp(int(headcommit.authored_date)).strftime('%Y-%m-%d %H:%M:%S') +  "  " + headcommit.message 
+            print 'DEBUG: latest commit: ' + commit_msg
+            pass
+        except git.exc.GitCommandError:
+            print "Git error. using local"
+            pass
     else:
         print 'DEBUG: cloning '+ config['remote_url']
-        git.Git().clone(config['remote_url'])
+        try:
+            git.Git().clone(config['remote_url'])
+        except git.exc.GitCommandError:
+            print "Git error. using local"
+            pass
 
 
 if __name__ == '__main__':

@@ -16,7 +16,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def throw_validation_error(validationError):
     print str(validationError)
-    return Response(validationError,status=400, mimetype='text/html')    
+    return Response(str(validationError),status=400, mimetype='text/html')    
 
 def allowed_file(filename):
     return '.' in filename and \
