@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from flask import Flask, request, Response, redirect, render_template, flash
+from flask import Flask, request, Response, redirect, render_template, flash, jsonify
 import os, json
 from os.path import isfile,join
 from jsonschema import validate, ValidationError
@@ -86,9 +86,12 @@ def api_get_versions(namespace,docType):
 
 @app.route('/schema/<namespace>/<docType>/<version>', methods=['GET'])
 def api_get_schema(namespace,docType,version):
-    resp = Response(get_schema_json(namespace,docType,version), status = 200, mimetype='application/json')
-    return resp
+    # MINIFY
+    if len(request.args) !=0:
+        if request.args.get('minify')== 'true':
+            app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
+    return jsonify(json.load(get_schema_json(namespace,docType,version)))
 
 @app.route('/validate/<namespace>/<docType>/<version>', methods=['GET', 'POST'])
 def api_get_schema_w_version(namespace,docType,version):
