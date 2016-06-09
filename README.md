@@ -9,7 +9,7 @@ In order to run the service use:
 Currently only configured to run on port 8080 with localhost as the host.
  
 ## Usage ##
-  Schemas are retrieved from [this github repo](https://github.com/mozilla-services/mozilla-pipeline-schemas)
+  Schemas are retrieved from [this github repo](https://github.com/mozilla-services/mozilla-pipeline-schemas).
   
   
   In general, the uri <-> schema name mapping is:
@@ -35,7 +35,7 @@ Currently only configured to run on port 8080 with localhost as the host.
 	  
             http://localhost:8080/validate/telemetry/main/4
 			
-		will pull up the file upload screen:
+		will pull up the file upload screen.
 		
 		
-			On clicking 'upload and validate' the service will POST the uploaded json and validate it with the schema specified in the uri.
+   	On clicking 'upload and validate' the service will POST the uploaded json and validate it with the schema specified in the uri.
