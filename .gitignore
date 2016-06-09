@@ -1,4 +1,4 @@
-server.log
+*.log
 /mozilla-pipeline-schemas/**
 /_test_/**
 **/*.pyc

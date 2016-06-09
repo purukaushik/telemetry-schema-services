@@ -174,4 +174,4 @@ def not_found(error=None):
 if __name__ == '__main__':
     logging.basicConfig(filename='core_service.log', filemode='a', level=logging.DEBUG, format='%(asctime)s %(levelname)-8s %(message)s',datefmt='%a, %d %b %Y %H:%M:%S',)
     gitcheckout()
-    app.run(host='0.0.0.0', port=8080)
+    app.run(host='0.0.0.0', port=8080, threaded=True)
