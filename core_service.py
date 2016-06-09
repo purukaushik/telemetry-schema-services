@@ -6,6 +6,8 @@ from jsonschema import validate, ValidationError
 from git_checkout import gitcheckout
 import gzip, StringIO
 import re
+import logging
+
 
 CWD = os.path.dirname(os.path.realpath(__file__))
 UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__name__))+ '/uploads/'
@@ -21,14 +23,6 @@ def throw_validation_error(validationError):
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.',1)[1] in ALLOWED_EXTENSIONS
-
-if not app.debug:
-    import logging
-    from logging import FileHandler
-    #TODO : change to rotating file handler thing
-    file_handler = FileHandler('server.log')
-    file_handler.setLevel(logging.DEBUG)
-    app.logger.addHandler(file_handler)
 
 def get_schema(fileName):
     print 'DEBUG: json schema full path :' + fileName
@@ -171,6 +165,8 @@ def not_found(error=None):
         'message': 'Not Found: '+ request.url,
     }
     return Response(json.dumps(message), status=404, mimetype='application/json')
+
 if __name__ == '__main__':
+    logging.basicConfig(filename='core_service.log', filemode='a', level=logging.DEBUG, format='%(asctime)s %(levelname)-8s %(message)s',datefmt='%a, %d %b %Y %H:%M:%S',)
     gitcheckout()
     app.run(host='0.0.0.0', port=8080)
