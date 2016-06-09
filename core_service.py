@@ -17,7 +17,7 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def throw_validation_error(validationError):
-    print str(validationError)
+    app.logger.error(str(validationError))
     return Response(str(validationError),status=400, mimetype='text/html')    
 
 def allowed_file(filename):
@@ -25,7 +25,7 @@ def allowed_file(filename):
         filename.rsplit('.',1)[1] in ALLOWED_EXTENSIONS
 
 def get_schema(fileName):
-    print 'DEBUG: json schema full path :' + fileName
+    app.logger.debug('json schema full path :' + fileName)
     schema_file = open(fileName)
     #  _. jsonify and return schema file
     return schema_file
@@ -40,7 +40,7 @@ def get_schema_json(namespace,docType,version):
         git_url_suffix= git_url_suffix+ '.' + version +'.'+ 'schema.json'
     fiFile = CWD + '/mozilla-pipeline-schemas/'+git_url_suffix
 
-    print "DEBUG: fetching and reading file: "+ fiFile
+    app.logger.debug("fetching and reading file: "+ fiFile)
     schema_json = get_schema(fiFile)
     return schema_json
 
@@ -57,7 +57,7 @@ def get_doctypes_versions(namespace, docType):
             lst.append(lst_item)
     else:
         for file in files:
-            print "DEBUG: looking at : " + file
+            app.logger.debug( " looking at : " + file)
             m = re.search('^' + docType+'\.'+'([0-9])\.',file)
             if m is not None:
                 version = m.group(1).replace('.','')
@@ -90,18 +90,18 @@ def api_get_schema(namespace,docType,version):
 @app.route('/validate/<namespace>/<docType>/<version>', methods=['GET', 'POST'])
 def api_get_schema_w_version(namespace,docType,version):
     # _. assemble payload from the parameters
-    print "DEBUG: api_get_schema method start"
-    print "DEBUG: assembling fileName from route"
+    app.logger.debug(" api_get_schema method start")
+    app.logger.debug(" assembling fileName from route")
     # construct file name from GET uri and search for schema in cwd/mozilla-pipeline-schemas/
     # assumes git clones into cwd 
     schema_json = get_schema_json(namespace,docType,version)
     if request.method == 'POST':
         main_schema = json.load(schema_json)
-        print "DEBUG: request is POST"
+        app.logger.debug(" request is POST")
         # handle POST - i.e validation of json
         if request.headers['Content-Type'] == 'application/json':
             try:
-                print "DEBUG: try'na validate"
+                app.logger.debug(" try'na validate")
                 validate(request.json, main_schema)
                 resp_str = {
                     "status" : 200,
@@ -111,7 +111,7 @@ def api_get_schema_w_version(namespace,docType,version):
             except ValidationError as e:
                 return throw_validation_error(e)
         elif request.headers['Content-Type'] == 'application/x-gzip':
-            print "DEBUG: Gzip option"
+            app.logger.debug(" Gzip option")
             file = StringIO.StringIO(request.data)
             ungzip = gzip.GzipFile(fileobj = file,mode ='rb')
             file_content = ungzip.read()
@@ -141,7 +141,7 @@ def api_get_schema_w_version(namespace,docType,version):
                         "status" : 200,
                         "message" : "json ok!"
                     }
-                    print "JSON Ok!"
+                    app.logger.debug( "JSON Ok!")
                     return Response(json.dumps(resp_str), status=200, mimetype='application/json')
                 except ValidationError as e:
                     return throw_validation_error(e)
@@ -150,7 +150,7 @@ def api_get_schema_w_version(namespace,docType,version):
                      "status": 400,
                      "message": "File not a json"
                  }
-                 print "Not a JSON"
+                 app.logger.debug("Not a JSON")
                  return Response(json.dumps(message), status = 400, mimetype='application/json')
     elif request.method == 'GET':
         # handle GET - i.e return schema requested
