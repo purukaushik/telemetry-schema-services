@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from flask import Flask, request, Response, redirect, render_template, flash, send_from_directory
+from flask import Flask, request, Response, redirect, render_template, flash, send_from_directory, jsonify
 import os, json
 from os.path import isfile,join
 from jsonschema import validate, ValidationError
