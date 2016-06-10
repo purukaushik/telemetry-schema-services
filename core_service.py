@@ -2,13 +2,13 @@
 """Schema Service Core.
 
 Usage:
-core_service.py [-p=<port>] [--host=<host>]
+core_service.py [-p <port>] [--host=<host>]
 core_service.py (-h | --help)
     
 Options:
 -h --help       Show this screen.
 --host=<host>   Hostname [default: 127.0.0.1]
--p=<port>       Port number to run flask on [default: 5000]
+-p <port>       Port number to run flask on [default: 5000]
 """
 from flask import Flask, request, Response, redirect, render_template, flash, jsonify
 import os, json
@@ -18,7 +18,7 @@ from git_checkout import gitcheckout
 import gzip, StringIO
 import re
 import logging
-
+from docopt import docopt
 
 CWD = os.path.dirname(os.path.realpath(__file__))
 UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__name__))+ '/uploads/'
@@ -177,11 +177,6 @@ def not_found(error=None):
     }
     return Response(json.dumps(message), status=404, mimetype='application/json')
 
-
-from docopt import docopt
-
-
-
 if __name__ == '__main__':
     arguments = docopt(__doc__, version='Schema service v0.1')
     print arguments
@@ -194,4 +189,8 @@ if __name__ == '__main__':
         
     logging.basicConfig(filename='core_service.log', filemode='a', level=logging.DEBUG, format='%(asctime)s %(levelname)-8s %(message)s',datefmt='%a, %d %b %Y %H:%M:%S',)
     gitcheckout()
-    app.run(host='0.0.0.0', port=8080, threaded=True)
+    app.run(host=host, port=port, threaded=True)
+
+
+
+
