@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-<<<<<<< HEAD
-from flask import Flask, request, Response, redirect, render_template, flash, send_from_directory, jsonify
-=======
 """Schema Service Core.
 
 Usage:
@@ -13,8 +10,7 @@ Options:
 --host=<host>   Hostname [default: 127.0.0.1]
 -p <port>       Port number to run flask on [default: 5000]
 """
-from flask import Flask, request, Response, redirect, render_template, flash, jsonify
->>>>>>> master
+from flask import Flask, request, Response, redirect, render_template, flash, jsonify,send_from_directory
 import os, json
 from os.path import isfile,join
 from jsonschema import validate, ValidationError
@@ -199,7 +195,3 @@ if __name__ == '__main__':
     logging.basicConfig(filename='core_service.log', filemode='a', level=logging.DEBUG, format='%(asctime)s %(levelname)-8s %(message)s',datefmt='%a, %d %b %Y %H:%M:%S',)
     gitcheckout()
     app.run(host=host, port=port, threaded=True)
-
-
-
-
