@@ -1,21 +1,13 @@
 #!/usr/bin/env python
 import git, os
-
+import json
 #REMOTE_URL = 'git@github.com:mozilla-services/mozilla-pipeline-schemas.git'
 #REMOTE_URL = 'https://github.com/purukaushik/mozilla-pipeline-schemas.git'
 #REMOTE_URL = 'https://github.com/mreid-moz/mozilla-pipeline-schemas.git'
 # TODO : periodically do this to get updated schemas
 
 #-----GIT CONFIG-----
-config = {
-    "remote_url": "https://github.com/purukaushik/mozilla-pipeline-schemas.git",
-    "branch" : "common", #default -master
-    "os_dir" : "./mozilla-pipeline-schemas"
-}
-
-
-
-
+config = json.load(open('git_config.json'))
 
 def gitcheckout():
     if os.path.isdir(config['os_dir']):
