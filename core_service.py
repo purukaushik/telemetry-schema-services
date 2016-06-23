@@ -31,6 +31,7 @@ def throw_validation_error(validationError):
     app.logger.error(str(validationError))
     return Response(str(validationError),status=400, mimetype='text/html')    
 
+# check for file in allowed extensions
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.',1)[1] in ALLOWED_EXTENSIONS
@@ -64,7 +65,7 @@ def get_doctypes_versions(namespace, docType):
         for file in files:
             m = re.search('^[A-Za-z]*\.', file)
             docType = m.group().replace('.','')
-            lst_item = (docType, '/schema/'+namespace+'/'+docType, None)
+            lst_item = (docType, '/schema/'+namespace+'/'+docType, None, None)
             lst.append(lst_item)
     else:
         for file in files:
@@ -72,7 +73,10 @@ def get_doctypes_versions(namespace, docType):
             m = re.search('^' + docType+'\.'+'([0-9])\.',file)
             if m is not None:
                 version = m.group(1).replace('.','')
-                lst_item = (version,'/schema/'+namespace+'/'+ docType +'/'+version, '/validate/'+namespace+"/"+docType+"/"+version)
+                schema = '/schema/'+namespace+'/'+ docType +'/'+version
+                minify = schema + '?minify=true'
+                lst_item = (version, schema, '/validate/'+namespace+"/"+docType+"/"+version, minify)
+                
                 lst.append(lst_item)
     return lst
 @app.route('/')
