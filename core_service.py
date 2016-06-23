@@ -15,7 +15,7 @@ import os, json
 from os.path import isfile,join
 from jsonschema import validate, ValidationError
 from git_checkout import gitcheckout
-from service_commons import get_schema, get_schema_json
+from service_commons import get_schema, get_schema_json, get_doctypes_versions
 import gzip, StringIO
 import re
 import logging
@@ -38,29 +38,7 @@ def allowed_file(filename):
         filename.rsplit('.',1)[1] in ALLOWED_EXTENSIONS
 
 
-def get_doctypes_versions(namespace, docType):
-    path_of_namespace = CWD + '/mozilla-pipeline-schemas/' + namespace
-    files = [f for f in os.listdir(path_of_namespace) if isfile(join(path_of_namespace,f))]
-    lst = list()
 
-    if docType== None:
-        for file in files:
-            m = re.search('^[A-Za-z]*\.', file)
-            docType = m.group().replace('.','')
-            lst_item = (docType, '/schema/'+namespace+'/'+docType, None, None)
-            lst.append(lst_item)
-    else:
-        for file in files:
-            app.logger.debug( " looking at : " + file)
-            m = re.search('^' + docType+'\.'+'([0-9])\.',file)
-            if m is not None:
-                version = m.group(1).replace('.','')
-                schema = '/schema/'+namespace+'/'+ docType +'/'+version
-                minify = schema + '?minify=true'
-                lst_item = (version, schema, '/validate/'+namespace+"/"+docType+"/"+version, minify)
-                
-                lst.append(lst_item)
-    return lst
 @app.route('/')
 def api_root():
     return Response(open('README.md').read(), status=200, mimetype='text/plain')
@@ -72,12 +50,12 @@ def api_get_file(path):
 
 @app.route('/schema/<namespace>', methods=['GET'])
 def api_get_doctypes(namespace):
-    lst = get_doctypes_versions(namespace, None)    
+    lst = get_doctypes_versions(namespace, None, app.logger)    
     return render_template('links.html', duct_tape=lst, listing='docTypes under '+ namespace)
 
 @app.route('/schema/<namespace>/<docType>', methods=['GET'])
 def api_get_versions(namespace,docType):
-    lst = get_doctypes_versions(namespace,docType)
+    lst = get_doctypes_versions(namespace,docType, app.logger)
     return render_template('links.html', duct_tape=lst, listing='versions of '+ docType)
 
 @app.route('/schema/<namespace>/<docType>/<version>', methods=['GET'])
