@@ -10,7 +10,7 @@ Options:
 --host=<host>   Hostname [default: 127.0.0.1]
 -p <port>       Port number to run flask on [default: 5000]
 """
-from flask import Flask, request, Response, redirect, render_template, flash, jsonify,send_from_directory
+from flask import Flask, request, Response, redirect, render_template, flash, jsonify,send_from_directory, url_for
 import os, json
 from os.path import isfile,join
 from jsonschema import validate, ValidationError
@@ -50,7 +50,11 @@ def api_get_file(path):
 
 @app.route('/schema/<namespace>', methods=['GET'])
 def api_get_doctypes(namespace):
-    lst = get_doctypes_versions(namespace, None, app.logger)    
+    try:
+        lst = get_doctypes_versions(namespace, None, app.logger)
+    except OSError:
+        #FIXME: Default to telemetry 
+        return redirect(url_for('api_get_doctypes', namespace='telemetry'))
     return render_template('links.html', duct_tape=lst, listing='docTypes under '+ namespace)
 
 @app.route('/schema/<namespace>/<docType>', methods=['GET'])
@@ -66,6 +70,15 @@ def api_get_schema(namespace,docType,version):
             app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
     return jsonify(json.load(get_schema_json(namespace,docType,version,app.logger)))
+
+
+@app.route('/validate/<namespace>', methods =['GET'])
+def api_validate_namespace(namespace):
+    return redirect(url_for('api_get_doctypes',namespace=namespace))
+
+@app.route('/validate/<namespace>/<docType>', methods=['GET'])
+def api_validate_doctype(namespace,docType):
+    return redirect(url_for('api_get_versions',namespace=namespace,docType=docType))
 
 @app.route('/validate/<namespace>/<docType>/<version>', methods=['GET', 'POST'])
 def api_get_schema_w_version(namespace,docType,version):
