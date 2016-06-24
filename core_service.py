@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """Schema Service Core.
-
+Starts the core python schema hosting/validation web service API.
 Usage:
 core_service.py [-p <port>] [--host=<host>]
 core_service.py (-h | --help)
@@ -15,12 +15,13 @@ import os, json
 from os.path import isfile,join
 from jsonschema import validate, ValidationError
 from git_checkout import gitcheckout
+from service_commons import get_schema, get_schema_json, get_doctypes_versions
 import gzip, StringIO
 import re
 import logging
 from docopt import docopt
 
-CWD = os.path.dirname(os.path.realpath(__file__))
+
 UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__name__))+ '/uploads/'
 ALLOWED_EXTENSIONS= set(['json'])
 
@@ -36,49 +37,8 @@ def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.',1)[1] in ALLOWED_EXTENSIONS
 
-def get_schema(fileName):
-    app.logger.debug('json schema full path :' + fileName)
-    schema_file = open(fileName)
-    #  _. jsonify and return schema file
-    return schema_file
 
-def get_schema_json(namespace,docType,version):
 
-    git_url_suffix = namespace + '/' + docType
-    # HOTFIX: until we include version number in schema file
-    if version == '0':
-        git_url_suffix= git_url_suffix+ '.' + 'schema.json'
-    else:
-        git_url_suffix= git_url_suffix+ '.' + version +'.'+ 'schema.json'
-    fiFile = CWD + '/mozilla-pipeline-schemas/'+git_url_suffix
-
-    app.logger.debug("fetching and reading file: "+ fiFile)
-    schema_json = get_schema(fiFile)
-    return schema_json
-
-def get_doctypes_versions(namespace, docType):
-    path_of_namespace = CWD + '/mozilla-pipeline-schemas/' + namespace
-    files = [f for f in os.listdir(path_of_namespace) if isfile(join(path_of_namespace,f))]
-    lst = list()
-
-    if docType== None:
-        for file in files:
-            m = re.search('^[A-Za-z]*\.', file)
-            docType = m.group().replace('.','')
-            lst_item = (docType, '/schema/'+namespace+'/'+docType, None, None)
-            lst.append(lst_item)
-    else:
-        for file in files:
-            app.logger.debug( " looking at : " + file)
-            m = re.search('^' + docType+'\.'+'([0-9])\.',file)
-            if m is not None:
-                version = m.group(1).replace('.','')
-                schema = '/schema/'+namespace+'/'+ docType +'/'+version
-                minify = schema + '?minify=true'
-                lst_item = (version, schema, '/validate/'+namespace+"/"+docType+"/"+version, minify)
-                
-                lst.append(lst_item)
-    return lst
 @app.route('/')
 def api_root():
     return Response(open('README.md').read(), status=200, mimetype='text/plain')
@@ -90,12 +50,12 @@ def api_get_file(path):
 
 @app.route('/schema/<namespace>', methods=['GET'])
 def api_get_doctypes(namespace):
-    lst = get_doctypes_versions(namespace, None)    
+    lst = get_doctypes_versions(namespace, None, app.logger)    
     return render_template('links.html', duct_tape=lst, listing='docTypes under '+ namespace)
 
 @app.route('/schema/<namespace>/<docType>', methods=['GET'])
 def api_get_versions(namespace,docType):
-    lst = get_doctypes_versions(namespace,docType)
+    lst = get_doctypes_versions(namespace,docType, app.logger)
     return render_template('links.html', duct_tape=lst, listing='versions of '+ docType)
 
 @app.route('/schema/<namespace>/<docType>/<version>', methods=['GET'])
@@ -105,7 +65,7 @@ def api_get_schema(namespace,docType,version):
         if request.args.get('minify')== 'true':
             app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
 
-    return jsonify(json.load(get_schema_json(namespace,docType,version)))
+    return jsonify(json.load(get_schema_json(namespace,docType,version,app.logger)))
 
 @app.route('/validate/<namespace>/<docType>/<version>', methods=['GET', 'POST'])
 def api_get_schema_w_version(namespace,docType,version):
@@ -114,7 +74,7 @@ def api_get_schema_w_version(namespace,docType,version):
     app.logger.debug(" assembling fileName from route")
     # construct file name from GET uri and search for schema in cwd/mozilla-pipeline-schemas/
     # assumes git clones into cwd 
-    schema_json = get_schema_json(namespace,docType,version)
+    schema_json = get_schema_json(namespace,docType,version,app.logger)
     if request.method == 'POST':
         main_schema = json.load(schema_json)
         app.logger.debug(" request is POST")
