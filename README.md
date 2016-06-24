@@ -39,3 +39,18 @@ Currently only configured to run on port 8080 with localhost as the host.
 		
 		
    	On clicking 'upload and validate' the service will POST the uploaded json and validate it with the schema specified in the uri.
+
+## CLI version
+To run the schema retrieval as a CLI program from terminal, the following will be useful:
+
+    Usage:
+    cli_service.py [(-n <namespace>)]
+    cli_service.py [(-n <namespace>  -d <doctype>)]
+    cli_service.py [(-n <namespace>  -d <doctype> -v <version>)]
+    cli_service.py (-h | --help)
+    
+    Options:
+    -h --help       Show this screen.
+    -n namespace    List all docTypes under namespace
+    -n namespace -d doctype List versions under namespace and docType
+    -n namespace -d doctype -v version Show schema @ namespace/docType/version
