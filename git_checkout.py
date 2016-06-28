@@ -7,17 +7,21 @@ import json
 # TODO : periodically do this to get updated schemas
 
 #-----GIT CONFIG-----
-config = json.load(open('git_config.json'))
+
 
 def gitcheckout():
+    checkout(get_config())
+    
+def checkout(config):
     if os.path.isdir(config['os_dir']):
         print 'DEBUG: directory exists. will pull instead of clone...'
         repo = git.Repo.init('./mozilla-pipeline-schemas')
         origin = repo.remotes.origin
         try:
+            print "Fetching branch: " + config['branch']
             fetch_info = origin.fetch(config['branch'])
             origin.pull(config['branch'])
-            print 'DEBUG: done pulling'
+            print 'DEBUG: done pulling ' + config['branch']
             headcommit = repo.head.commit
             import datetime
             commit_msg = repr(headcommit.author) + "  " + datetime.datetime.fromtimestamp(int(headcommit.authored_date)).strftime('%Y-%m-%d %H:%M:%S') +  "  " + headcommit.message 
@@ -34,6 +38,8 @@ def gitcheckout():
             print "Git error. using local"
             pass
 
+def get_config():
+    return json.load(open('git_config.json'))
 
 if __name__ == '__main__':
     gitcheckout()

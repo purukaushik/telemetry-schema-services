@@ -1,5 +1,6 @@
 import os, json, logging
 from os.path import isfile,join
+from git_checkout import gitcheckout, get_config, checkout
 import re
 CWD = os.path.dirname(os.path.realpath(__file__))
 
@@ -53,3 +54,13 @@ def get_doctypes_versions(namespace, docType,logger):
                 
                 lst.append(lst_item)
     return lst
+
+def checkout_branch(branch):
+    config = get_config()
+    config['branch'] = branch
+    checkout(config)
+
+if __name__ == "__main__" :
+    branch  = 'sandbox'
+    print "checking out branch \'"+branch+"\' "
+    checkout_branch(branch)
