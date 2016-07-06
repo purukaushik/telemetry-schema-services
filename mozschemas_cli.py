@@ -1,10 +1,10 @@
 """Schema Service CLI.
 Schema retrieval command line utility.
 Usage:
-cli_service.py [(-n <namespace>)]
-cli_service.py [(-n <namespace>  -d <doctype>)]
-cli_service.py [(-n <namespace>  -d <doctype> -v <version>)]
-cli_service.py (-h | --help)
+mozschemas_cli.py [(-n <namespace>)]
+mozschemas_cli.py [(-n <namespace>  -d <doctype>)]
+mozschemas_cli.py [(-n <namespace>  -d <doctype> -v <version>)]
+mozschemas_cli.py (-h | --help)
     
 Options:
 -h --help       Show this screen.
