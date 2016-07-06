@@ -27,13 +27,13 @@ def checkout(config):
         
 def fetch_branch(config):
     logger.debug('directory exists. will pull instead of clone...')
-    repo = git.Repo.init('./mozilla-pipeline-schemas')
+    repo = git.Repo.init("./" + config['os_dir'])
     origin = repo.remotes.origin
     try:
         logger.debug("Fetching branch: " + config['branch'])
         origin.fetch(config['branch'])
         # git checkout branch
-        git.Git('./mozilla-pipeline-schemas').checkout(config['branch'])
+        git.Git('./' + config['os_dir']).checkout(config['branch'])
         # git pull origin branch
         fetch_info =origin.pull(config['branch'])
         
