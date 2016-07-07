@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """Schema Service CLI.
 Schema retrieval command line utility.
 Usage:
@@ -13,32 +14,34 @@ Options:
 -n namespace -d doctype -v version Show schema @ namespace/docType/version
 """
 
-from mozschemas_common import get_schema, get_schema_json, get_doctypes_versions
+from mozschemas_common import get_schema_json, get_doctypes_versions
 from docopt import docopt
-import json
+import logging
+
 if __name__ == "__main__":
+    logger = logging.getLogger(__name__)
     arguments = docopt(__doc__, version='CLI version v0.0')
-    
+
+    # defaults
     namespace = 'telemetry'
     docType = 'main'
+
     if arguments['-n'] is not None:
         namespace = arguments['-n']
         
         docType = arguments['-d']
         version = arguments['-v']
-        import logging
-        logger = logging.getLogger(__name__)
         lst = get_doctypes_versions(namespace,docType,logger)
         versions = list()
-        for needed,u1,u2,u3 in lst:
+        for needed, u1, u2, u3 in lst:
             versions.append(needed)    
         if version is not None:
             if version in versions:
                 print get_schema_json(namespace,docType,version,logger).read()
             else:
                 print "No such version. Try one of these:\n"
+                print versions
         else:
-            
             if len(versions)==0:
                 print "No such docType. Try one of these:\n"
                 lst = get_doctypes_versions(namespace,None,logger)
@@ -48,5 +51,4 @@ if __name__ == "__main__":
                 print versions
     else:
         print "ERROR! Specify Namespace."
-
-        
+        print __doc__

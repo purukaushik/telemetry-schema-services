@@ -5,3 +5,4 @@
 sample_v4_ping.json
 sample_v4_ping.json.gz
 .DS_Store
+/.idea/**
