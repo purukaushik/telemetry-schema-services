@@ -20,7 +20,7 @@ import logging
 
 if __name__ == "__main__":
     logger = logging.getLogger(__name__)
-    arguments = docopt(__doc__, version='CLI version v0.0')
+    arguments = docopt(__doc__, version = 'CLI version v0.0')
 
     # defaults
     namespace = 'telemetry'
@@ -31,22 +31,22 @@ if __name__ == "__main__":
         
         docType = arguments['-d']
         version = arguments['-v']
-        lst = get_doctypes_versions(namespace,docType,logger)
+        lst = get_doctypes_versions(namespace, docType, logger)
         versions = list()
-        for needed, u1, u2, u3 in lst:
-            versions.append(needed)    
+        for doctype_version, u1, u2, u3 in lst:
+            versions.append(doctype_version)
         if version is not None:
             if version in versions:
-                print get_schema_json(namespace,docType,version,logger).read()
+                print get_schema_json(namespace, docType, version, logger).read()
             else:
                 print "No such version. Try one of these:\n"
                 print versions
         else:
             if len(versions)==0:
                 print "No such docType. Try one of these:\n"
-                lst = get_doctypes_versions(namespace,None,logger)
-                for needed,u1,u2,u3 in lst:
-                    print needed
+                lst = get_doctypes_versions(namespace, None, logger)
+                for doctype_version, u1, u2, u3 in lst:
+                    print doctype_version
             else:
                 print versions
     else:
