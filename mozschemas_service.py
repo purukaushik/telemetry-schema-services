@@ -94,11 +94,7 @@ def api_get_schema_w_version(namespace, docType, version):
         if request.headers['Content-Type'] == 'application/json':
             try:
                 app.logger.debug(" Validating...")
-                validate(request.json, main_schema)
-                resp_str = {
-                    "status" : 200,
-                    "message" : "JSON is valid."
-                }
+                resp_str = validate_json(request.json, main_schema)
                 return jsonify(resp_str)
             except ValidationError as e:
                 return throw_validation_error(e)
@@ -108,11 +104,7 @@ def api_get_schema_w_version(namespace, docType, version):
             ungzip = gzip.GzipFile(fileobj = uploaded_file, mode = 'rb')
             file_content = ungzip.read()
             try:
-                validate(json.loads(file_content), main_schema)
-                resp_str = {
-                    "status": 200,
-                    "message": "JSON is valid."
-                }
+                resp_str = validate_json(json.loads(file_content), main_schema)
                 return jsonify(resp_str)
             except ValidationError as e:
                 return throw_validation_error(e)
@@ -121,16 +113,12 @@ def api_get_schema_w_version(namespace, docType, version):
                 error = 'There was an error processing your file. Please try again.'
                 return render_template('file_upload.html', error = error)
             uploaded_file = request.files['file']
-            if uploaded_file.filename == '' :
+            if uploaded_file.filename == '':
                 error = 'No file uploaded. Please select a json file to continue.'
                 return render_template('file_upload.html', error = error)
             if uploaded_file and allowed_file(uploaded_file.filename):
                 try:
-                    validate(json.load(uploaded_file), main_schema)
-                    resp_str = {
-                        "status": 200,
-                        "message": "JSON is valid."
-                    }
+                    resp_str = validate_json(json.load(uploaded_file), main_schema)
                     app.logger.debug("JSON is valid!")
                     return jsonify(resp_str)
                 except ValidationError as e:
@@ -146,6 +134,16 @@ def api_get_schema_w_version(namespace, docType, version):
         # handle GET - i.e return schema requested
         # File handler here
         return render_template('file_upload.html')
+
+
+def validate_json(json_file, main_schema):
+    validate(json_file, main_schema)
+    resp_str = {
+        "status": 200,
+        "message": "JSON is valid."
+    }
+    return resp_str
+
 
 @app.errorhandler(404)
 def not_found(error = None):
