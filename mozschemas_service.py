@@ -69,6 +69,8 @@ def api_get_schema(namespace, docType, version):
             app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
         else:
             app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
+    else:
+        app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
     return jsonify(json.load(get_schema_json(namespace, docType, version, app.logger)))
 
 @app.route('/validate/<namespace>', methods = ['GET'])
