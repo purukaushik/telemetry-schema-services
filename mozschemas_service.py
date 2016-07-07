@@ -15,7 +15,7 @@ import os, json
 from os.path import isfile,join
 from jsonschema import validate, ValidationError
 from git_checkout import gitcheckout
-from service_commons import get_schema, get_schema_json, get_doctypes_versions
+from mozschemas_common import get_schema, get_schema_json, get_doctypes_versions
 import gzip, StringIO
 import re
 import logging

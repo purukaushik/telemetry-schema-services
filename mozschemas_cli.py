@@ -13,7 +13,7 @@ Options:
 -n namespace -d doctype -v version Show schema @ namespace/docType/version
 """
 
-from service_commons import get_schema, get_schema_json, get_doctypes_versions
+from mozschemas_common import get_schema, get_schema_json, get_doctypes_versions
 from docopt import docopt
 import json
 if __name__ == "__main__":
