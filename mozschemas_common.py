@@ -24,7 +24,9 @@ def get_schema_json(namespace, docType, version, logger):
     return schema_json
 
 def get_doctypes_versions(namespace, docType, logger):
-    """ Provided a namespace and docType, it scans the filesystem and returns a list - either all doctypes under namespace/ or all versions under a namespace/doctype
+    """ Returns one of two lists:
+        1. If both namespace and docType is provided returns list of versions of schemas under namespace/docType
+        2. If only namespace is provided, lists all docTypes under namespace
     """
     path_of_namespace = CWD + '/mozilla-pipeline-schemas/' + namespace
     files = [f for f in os.listdir(path_of_namespace) if isfile(join(path_of_namespace, f))]
