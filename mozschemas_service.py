@@ -7,8 +7,8 @@ mozschemas_service.py (-h | --help)
     
 Options:
 -h --help       Show this screen.
---host=<host>   Hostname [default: 127.0.0.1]
--p <port>       Port number to run flask on [default: 5000]
+--host=<host>   Hostname [default: 0.0.0.0]
+-p <port>       Port number to run flask on [default: 8080]
 """
 from flask import Flask, request, Response, redirect, render_template, flash, jsonify, send_from_directory, url_for
 from werkzeug.utils import secure_filename
@@ -157,14 +157,9 @@ def not_found(error = None):
 
 if __name__ == '__main__':
     arguments = docopt(__doc__, version = 'Schema service v0.1')
-    print arguments
-    host = '127.0.0.1'
-    port = 5000
-    if '--host' in arguments:
-        host = arguments['--host']
-    if '-p' in arguments:
-        port = arguments['-p']
+    host = arguments.get('--host', '0.0.0.0')
+    port = arguments.get('-p', 8080)
 
-    logging.basicConfig(filename = 'core_service.log', filemode = 'a', level = logging.DEBUG, format = '%(asctime)s %(levelname)-8s %(message)s', datefmt = '%a, %d %b %Y %H:%M:%S')
+    logging.basicConfig(filename = 'mozschemas_service.log', filemode = 'a', level = logging.DEBUG, format = '%(asctime)s %(levelname)-8s %(message)s', datefmt = '%a, %d %b %Y %H:%M:%S')
     gitcheckout()
     app.run(host = host, port = port, threaded = True)
