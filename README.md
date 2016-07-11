@@ -3,17 +3,20 @@ Service API to retrieve telemetry schemas and validate them against incoming jso
 	
 ## Running the service ##
 
-In order to run the service use:
-
-    $ python core_service.py
-Currently only configured to run on port 8080 with localhost as the host.
- 
+  Schema service can be started with the following options:
+`   ./mozschemas_service.py [-p <port>] [--host=<host>]
+    ./mozschemas_service.py (-h | --help)
+    Options:
+    -h --help       Show this screen.
+    --host=<host>   Hostname [default: 127.0.0.1]
+    -p <port>       Port number to run flask on [default: 5000]
+`
 ## Usage ##
   Schemas are retrieved from [this github repo](https://github.com/mozilla-services/mozilla-pipeline-schemas).
   
   
   In general, the uri <-> schema name mapping is:
-  &lt;namespace&gt;/&lt;doctype&gt;/&lt;version&gt; translates to namespace/doctype.version.schema.json
+  `<namespace>/<doctype>/<version>` translates to namespace/doctype.version.schema.json
   
   e.g telemetry/main/4 refers to the main.4.schema.json located in telemetry/ folder.
   
@@ -43,12 +46,10 @@ Currently only configured to run on port 8080 with localhost as the host.
 ## CLI version
 To run the schema retrieval as a CLI program from terminal, the following will be useful:
 
-    Usage:
-    cli_service.py [(-n <namespace>)]
-    cli_service.py [(-n <namespace>  -d <doctype>)]
-    cli_service.py [(-n <namespace>  -d <doctype> -v <version>)]
-    cli_service.py (-h | --help)
-    
+    ./mozschemas_cli.py [(-n <namespace>)]
+    ./mozschemas_cli.py [(-n <namespace>  -d <doctype>)]
+    ./mozschemas_cli.py [(-n <namespace>  -d <doctype> -v <version>)]
+    ./mozschemas_cli.py (-h | --help)
     Options:
     -h --help       Show this screen.
     -n namespace    List all docTypes under namespace

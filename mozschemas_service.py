@@ -33,7 +33,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def throw_validation_error(validationError):
     app.logger.error("Error in validation.")
     app.logger.error(str(validationError))
-    return Response(str(validationError), status=400, mimetype='text/html')
+    return Response(str(validationError), status=400, mimetype='text/plain')
 
 # check for file in allowed extensions
 def allowed_file(filename):
