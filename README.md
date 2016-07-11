@@ -4,13 +4,16 @@ Service API to retrieve telemetry schemas and validate them against incoming jso
 ## Running the service ##
 
   Schema service can be started with the following options:
-`   ./mozschemas_service.py [-p <port>] [--host=<host>]
+
+    ./mozschemas_service.py [-p <port>] [--host=<host>]
     ./mozschemas_service.py (-h | --help)
     Options:
     -h --help       Show this screen.
     --host=<host>   Hostname [default: 127.0.0.1]
     -p <port>       Port number to run flask on [default: 5000]
-`
+
+
+ 
 ## Usage ##
   Schemas are retrieved from [this github repo](https://github.com/mozilla-services/mozilla-pipeline-schemas).
   
