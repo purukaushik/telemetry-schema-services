@@ -4,28 +4,28 @@ import json
 import datetime
 import logging
 
-logging.basicConfig(filename='git_checkout.log', filemode='a', level=logging.DEBUG, format='%(asctime)s %(levelname)-8s %(message)s',datefmt='%a, %d %b %Y %H:%M:%S',)
-logger = logging.getLogger('git_checkout')
+#logging.basicConfig(filename='git_checkout.log', filemode='a', level=logging.DEBUG, format='%(asctime)s %(levelname)-8s %(message)s',datefmt='%a, %d %b %Y %H:%M:%S',)
+#logger = logging.getLogger('git_checkout')
 
-def gitcheckout():
-    checkout(get_config())
+def gitcheckout(logger):
+    checkout(get_config(), logger)
     
-def checkout(config):
+def checkout(config, logger):
     """
     Checkout from git with values from branch=config['branch'], remote_url=config['remote_url']
     """
     if os.path.isdir(config['os_dir']):
-        fetch_branch(config)
+        fetch_branch(config, logger)
     else:
         logger.debug('cloning '+ config['remote_url'])
         try:
             git.Git().clone(config['remote_url'])
-            fetch_branch(config)
+            fetch_branch(config, logger)
         except git.exc.GitCommandError:
             logger.warn('Git error. using local')
             pass
         
-def fetch_branch(config):
+def fetch_branch(config, logger):
     logger.debug('directory exists. will pull instead of clone...')
     repo = git.Repo.init("./" + config['os_dir'])
     origin = repo.remotes.origin
