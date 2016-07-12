@@ -46,7 +46,7 @@ def api_root():
 
 @app.route('/file/<path:path>', methods = ['GET'])
 def api_get_file(path):
-    return send_from_directory(CWD + '/mozilla-pipeline-schemas/', secure_filename(path))
+    return send_from_directory(CWD + '/mozilla-pipeline-schemas/', path)
 
 @app.route('/schema/<namespace>', methods=['GET'])
 def api_get_doctypes(namespace):
