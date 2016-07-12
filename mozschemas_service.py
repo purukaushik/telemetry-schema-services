@@ -15,7 +15,7 @@ import os
 import json
 from jsonschema import validate, ValidationError
 from git_checkout import gitcheckout
-from mozschemas_common import get_schema_json, get_doctypes_versions
+from mozschemas_common import SchemasLocalFilesHelper
 import gzip
 import StringIO
 import logging
@@ -50,14 +50,14 @@ def api_get_file(path):
 @app.route('/schema/<namespace>', methods=['GET'])
 def api_get_doctypes(namespace):
     try:
-        lst = get_doctypes_versions(namespace, None, app.logger)
+        lst = SchemasLocalFilesHelper('/mozilla-pipeline-schemas/').get_doctypes_versions(namespace, None, app.logger)
     except OSError:
         return redirect(url_for('api_get_doctypes', namespace='telemetry'))
     return render_template('links.html', display_list = lst, listing = 'docTypes under ' + namespace)
 
 @app.route('/schema/<namespace>/<docType>', methods = ['GET'])
 def api_get_versions(namespace, docType):
-    lst = get_doctypes_versions(namespace, docType, app.logger)
+    lst = SchemasLocalFilesHelper('/mozilla-pipeline-schemas/').get_doctypes_versions(namespace, docType, app.logger)
     return render_template('links.html', display_list = lst, listing = 'versions of ' + docType)
 
 @app.route('/schema/<namespace>/<docType>/<version>', methods = ['GET'])
@@ -70,7 +70,7 @@ def api_get_schema(namespace, docType, version):
             app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
     else:
         app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
-    return jsonify(json.load(get_schema_json(namespace, docType, version, app.logger)))
+    return jsonify(json.load(SchemasLocalFilesHelper('/mozilla-pipeline-schemas/').get_schema_json(namespace, docType, version, app.logger)))
 
 @app.route('/validate/<namespace>', methods = ['GET'])
 def api_validate_namespace(namespace):
@@ -87,7 +87,7 @@ def api_get_schema_w_version(namespace, docType, version):
     app.logger.debug(" assembling fileName from route")
     # construct file name from GET uri and search for schema in cwd/mozilla-pipeline-schemas/
     # assumes git clones into cwd 
-    schema_json = get_schema_json(namespace, docType, version, app.logger)
+    schema_json = SchemasLocalFilesHelper('/mozilla-pipeline-schemas/').get_schema_json(namespace, docType, version, app.logger)
     if request.method == 'POST':
         main_schema = json.load(schema_json)
         app.logger.debug(" request is POST")

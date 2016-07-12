@@ -14,7 +14,7 @@ Options:
 -n namespace -d doctype -v version Show schema @ namespace/docType/version
 """
 
-from mozschemas_common import get_schema_json, get_doctypes_versions
+from mozschemas_common import SchemasLocalFilesHelper
 from docopt import docopt
 import logging
 
@@ -25,26 +25,26 @@ if __name__ == "__main__":
     # defaults
     namespace = 'telemetry'
     docType = 'main'
-
+    schelper = SchemasLocalFilesHelper('/mozilla-pipeline-schemas/')
     if arguments['-n'] is not None:
         namespace = arguments['-n']
         
         docType = arguments['-d']
         version = arguments['-v']
-        lst = get_doctypes_versions(namespace, docType, logger)
+        lst = schelper.get_doctypes_versions(namespace, docType, logger)
         versions = list()
         for doctype_version, u1, u2, u3 in lst:
             versions.append(doctype_version)
         if version is not None:
             if version in versions:
-                print get_schema_json(namespace, docType, version, logger).read()
+                print schelper.get_schema_json(namespace, docType, version, logger).read()
             else:
                 print "No such version. Try one of these:\n"
                 print versions
         else:
             if len(versions)==0:
                 print "No such docType. Try one of these:\n"
-                lst = get_doctypes_versions(namespace, None, logger)
+                lst = schelper.get_doctypes_versions(namespace, None, logger)
                 for doctype_version, u1, u2, u3 in lst:
                     print doctype_version
             else:
