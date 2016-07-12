@@ -4,9 +4,6 @@ import json
 import datetime
 import logging
 
-#logging.basicConfig(filename='git_checkout.log', filemode='a', level=logging.DEBUG, format='%(asctime)s %(levelname)-8s %(message)s',datefmt='%a, %d %b %Y %H:%M:%S',)
-#logger = logging.getLogger('git_checkout')
-
 def gitcheckout(logger):
     checkout(get_config(), logger)
     

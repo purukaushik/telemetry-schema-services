@@ -11,7 +11,6 @@ Options:
 -p <port>       Port number to run flask on [default: 8080]
 """
 from flask import Flask, request, Response, redirect, render_template, flash, jsonify, send_from_directory, url_for
-from werkzeug.utils import secure_filename
 import os
 import json
 from jsonschema import validate, ValidationError
@@ -131,7 +130,7 @@ def api_get_schema_w_version(namespace, docType, version):
                      "message": "File not a json"
                  }
                  app.logger.debug("Not a JSON")
-                 return jsonify(message)
+                 return Response(response=json.dumps(message), status=400, mimetype="application/json")
     elif request.method == 'GET':
         # handle GET - i.e return schema requested
         # File handler here
@@ -153,7 +152,7 @@ def not_found(error = None):
         'status': 404,
         'message': 'Not Found: ' + request.url,
     }
-    return jsonify(message)
+    return Response(json.dumps(message), status=404, mimetype='application/json')
 
 if __name__ == '__main__':
     arguments = docopt(__doc__, version = 'Schema service v0.1')
