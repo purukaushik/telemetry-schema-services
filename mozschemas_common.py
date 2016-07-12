@@ -10,8 +10,8 @@ class SchemasLocalFilesHelper:
     def __init__(self):
         self.schema_base_path = CWD + '/mozilla-pipeline-schemas/'
 
-    def __init__(self, schemasDirPath):
-        self.schema_base_path = CWD + schemasDirPath
+    def __init__(self, schemas_dir_path):
+        self.schema_base_path = CWD + schemas_dir_path
 
     def get_schema(self, fileName, logger):
         """ Locate and return the schema specified by full path in fileName.
