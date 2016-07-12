@@ -24,7 +24,7 @@ class SchemasLocalFilesHelper:
         """ Construct full path of schema requested at /namespace/docType/version to /namespace/docType.version.schema.json and return the json file.
             Returns: a file object of the schema
         """
-        git_url_suffix = namespace + '/' + docType + '.' + version + '.' + 'schema.json'
+        git_url_suffix = namespace + '/' + docType + '.' + version + '.schema.json'
         schema_file = self.schema_base_path + git_url_suffix
 
         logger.debug("Fetching and reading file: " + schema_file)
@@ -39,7 +39,7 @@ class SchemasLocalFilesHelper:
                 The list contains tuples of the form-  ( <docType:String> , <URI-endpoint-to-docType:String> , None, None)
         """
         path_of_namespace = self.schema_base_path + namespace
-        files = [f for f in os.listdir(path_of_namespace) if isfile(join(path_of_namespace, f))]
+        files = [f for f in os.listdir(path_of_namespace) if isfile(join(path_of_namespace, f)) and f.__contains__('.schema.json')]
         version_list = list()
 
         if docType is None:
