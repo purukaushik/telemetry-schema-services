@@ -2,3 +2,4 @@ flask
 jsonschema
 gitpython
 docopt
+nose2
