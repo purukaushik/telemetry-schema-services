@@ -1,4 +1,9 @@
 #!/usr/bin/env python
+
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 import git, os
 import json
 import datetime
@@ -47,4 +52,5 @@ def get_config():
     return json.load(open('git_config.json'))
 
 if __name__ == '__main__':
-    gitcheckout()
+
+    gitcheckout(logging.getLogger(__name__))

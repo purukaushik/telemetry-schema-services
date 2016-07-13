@@ -2,7 +2,9 @@ import os, json, logging
 from os.path import isfile,join
 from git_checkout import gitcheckout, get_config, checkout
 import re
-
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 CWD = os.path.dirname(os.path.realpath(__file__))
 
 class SchemasLocalFilesHelper:
