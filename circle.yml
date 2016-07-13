@@ -6,3 +6,13 @@ machine:
     version: 2.7.10
   services:
     - docker
+dependencies:
+  override:
+    - docker info
+    - docker build -t telemetry-schema-services
+deployment:
+  hub:
+    branch: master
+    commands:
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker push telemetry-schema-services
