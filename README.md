@@ -1,4 +1,6 @@
 # telemetry-schema-services
+[![CircleCI](https://circleci.com/gh/purukaushik/telemetry-schema-services.svg?style=svg)](https://circleci.com/gh/purukaushik/telemetry-schema-services)
+
 Service API to retrieve telemetry schemas and validate them against incoming json.
 	
 ## Running the service ##
