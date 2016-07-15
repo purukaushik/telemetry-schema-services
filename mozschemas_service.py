@@ -35,7 +35,13 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def throw_validation_error(validationError):
     app.logger.error("Error in validation.")
     app.logger.error(str(validationError))
-    return Response(str(validationError), status=400, mimetype='text/plain')
+    message = {
+        "message" : " JSON is invalid.",
+        "validation-message" : str(validationError),
+        "status" : 400,
+
+    }
+    return Response(json.dumps(message), status=400, mimetype='application/json')
 
 # check for file in allowed extensions
 def allowed_file(filename):

@@ -8,5 +8,6 @@
     "crash" : ["4"]
   },
   "valid/telemetry/main/4" : "sample_v4_ping.json",
-  "non_json" : "README.md"
+  "non_json" : "README.md",
+  "skip_invalid" : ["core" , "common", "crash"]
 }

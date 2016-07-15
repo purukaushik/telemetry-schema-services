@@ -1,5 +1,4 @@
 import json
-import os
 import mozschemas_service
 import unittest
 import flask
@@ -18,7 +17,6 @@ class TestServiceApp(unittest.TestCase):
 
     def test_validate_version_end_point(self):
         self.is_endpoint_good('/validate/','text/html')
-
 
     def is_valid_json_in_upload(self, endpoint, valid_json):
         response = self.service_app.post(endpoint, data=dict(file=valid_json))
@@ -41,16 +39,20 @@ class TestServiceApp(unittest.TestCase):
     def test_file_upload_module(self):
         namespace = self.config['namespace']
 
-        for docTypes, versions in self.config['docType_versions'].items():
+        for docType, versions in self.config['docType_versions'].items():
 
             for version in versions:
-                schema_tag = namespace + "/" + docTypes + "/" + version
+                schema_tag = namespace + "/" + docType + "/" + version
                 endpoint = '/validate/' + schema_tag
 
                 if 'valid'+schema_tag in self.config:
                     valid_json = open(self.config['valid/'+ schema_tag])
                     self.is_valid_json_in_upload(endpoint, valid_json)
-                self.is_invalid_json_in_upload(endpoint, invalid_json={})
+
+                if docType not in self.config['skip_invalid']:
+                    invalid_json = open('test_config.json')
+                    self.is_invalid_json_in_upload(endpoint, invalid_json=invalid_json)
+
                 if 'non_json' in self.config:
                     non_json = open(self.config['non_json'])
                     self.is_non_json_in_upload(endpoint, non_json)
@@ -60,7 +62,6 @@ class TestServiceApp(unittest.TestCase):
         for docType in self.config['docTypes']:
             endpoint = '/schema/' + namespace + "/" + docType
             resp = self.service_app.get(endpoint)
-
             self.is_response_good(resp, 200, 'text/html')
 
     def is_endpoint_good(self, endpoint_prefix, mimetype):
