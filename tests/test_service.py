@@ -16,6 +16,45 @@ class TestServiceApp(unittest.TestCase):
     def test_schema_docTypes_versions_end_point(self):
         self.is_endpoint_good('/schema/', 'application/json')
 
+    def test_validate_version_end_point(self):
+        self.is_endpoint_good('/validate/','text/html')
+
+
+    def is_valid_json_in_upload(self, endpoint, valid_json):
+        response = self.service_app.post(endpoint, data=dict(file=valid_json))
+        self.is_response_good(response, 200, 'application/json')
+        self.assertIsInstance(response, flask.Response)
+        self.assertIn("valid", str(response.data))
+
+    def is_invalid_json_in_upload(self, endpoint, invalid_json):
+        response = self.service_app.post(endpoint, data=dict(file=invalid_json))
+        self.is_response_good(response, 400, 'application/json')
+        self.assertIsInstance(response, flask.Response)
+        self.assertIn("invalid", str(response.data))
+
+    def is_non_json_in_upload(self, endpoint, non_json):
+        response = self.service_app.post(endpoint, data=dict(file=non_json))
+        self.is_response_good(response, 400, 'application/json')
+        self.assertIsInstance(response, flask.Response)
+        self.assertIn("not a json", str(response.data))
+
+    def test_file_upload_module(self):
+        namespace = self.config['namespace']
+
+        for docTypes, versions in self.config['docType_versions'].items():
+
+            for version in versions:
+                schema_tag = namespace + "/" + docTypes + "/" + version
+                endpoint = '/validate/' + schema_tag
+
+                if 'valid'+schema_tag in self.config:
+                    valid_json = open(self.config['valid/'+ schema_tag])
+                    self.is_valid_json_in_upload(endpoint, valid_json)
+                self.is_invalid_json_in_upload(endpoint, invalid_json={})
+                if 'non_json' in self.config:
+                    non_json = open(self.config['non_json'])
+                    self.is_non_json_in_upload(endpoint, non_json)
+
     def test_schema_docTypes_end_point(self):
         namespace = self.config['namespace']
         for docType in self.config['docTypes']:
@@ -34,7 +73,7 @@ class TestServiceApp(unittest.TestCase):
                 if endpoint_prefix == '/file/' :
                     filename = docTypes + "." + version + ".schema.json"
                     filepath = namespace + filename
-                elif endpoint_prefix == '/schema/' :
+                elif endpoint_prefix == '/schema/' or endpoint_prefix == '/validate/' :
                     filename = docTypes + "/" + version
                     filepath = namespace + filename
                 resp = self.service_app.get(endpoint_prefix + filepath)
