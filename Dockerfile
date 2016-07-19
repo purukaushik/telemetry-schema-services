@@ -4,7 +4,7 @@ FROM ubuntu
 # apt update it
 RUN apt-get update
 # get essentials
-RUN apt-get install -y tar git curl nano emacs wget dialog net-tools build-essential
+RUN apt-get install -y tar git curl wget dialog net-tools build-essential
 # get python
 RUN apt-get install -y python python-dev python-distribute python-pip
 # clone our repo
