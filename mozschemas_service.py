@@ -168,6 +168,6 @@ if __name__ == '__main__':
     host = arguments.get('--host', '0.0.0.0')
     port = arguments.get('-p', 8080)
 
-    logging.basicConfig(filename = 'mozschemas_service.log', filemode = 'a', level = logging.DEBUG, format = '%(asctime)s %(levelname)-8s %(message)s', datefmt = '%a, %d %b %Y %H:%M:%S')
+    logging.basicConfig(level = logging.DEBUG, format = '%(asctime)s %(levelname)-8s %(message)s', datefmt = '%a, %d %b %Y %H:%M:%S')
     gitcheckout(app.logger)
     app.run(host = host, port = port, threaded = True)
