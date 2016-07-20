@@ -23,14 +23,13 @@ import gzip
 import StringIO
 import logging
 from docopt import docopt
+from mozilla_cloud_services_logger.formatters import JsonLogFormatter
+import sys
 
-
-UPLOAD_FOLDER = os.path.dirname(os.path.realpath(__name__))+ '/uploads/'
 ALLOWED_EXTENSIONS= set(['json'])
 CWD = os.path.dirname(os.path.realpath(__file__))
 
 app = Flask(__name__)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def throw_validation_error(validationError):
     app.logger.error("Error in validation.")
@@ -168,6 +167,10 @@ if __name__ == '__main__':
     host = arguments.get('--host', '0.0.0.0')
     port = arguments.get('-p', 8080)
 
-    logging.basicConfig(level = logging.DEBUG, format = '%(asctime)s %(levelname)-8s %(message)s', datefmt = '%a, %d %b %Y %H:%M:%S')
+    handler = logging.StreamHandler(stream=sys.stdout)
+    app.logger.setLevel(logging.DEBUG)
+    handler.setFormatter(JsonLogFormatter(logger_name=__name__))
+    app.logger.addHandler(handler)
+
     gitcheckout(app.logger)
     app.run(host = host, port = port, threaded = True)
