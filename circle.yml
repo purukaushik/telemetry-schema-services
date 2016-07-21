@@ -6,7 +6,6 @@ machine:
     - docker
 dependencies:
   override:
-    - docker info
     - docker build -t purush/telemetry-schema-services .
 deployment:
   hub:
