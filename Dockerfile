@@ -15,7 +15,7 @@ RUN git clone -b testcases https://github.com/purukaushik/telemetry-schema-servi
 # pip install requirements.txt
 RUN pip install -r /telemetry-schema-services/requirements.txt
 
-
+# package for logging in mozlog format
 RUN git clone https://github.com/mozilla/mozilla-cloud-services-logger.git
 WORKDIR /mozilla-cloud-services-logger
 RUN pwd
