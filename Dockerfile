@@ -18,7 +18,6 @@ RUN pip install -r /telemetry-schema-services/requirements.txt
 # package for logging in mozlog format
 RUN git clone https://github.com/mozilla/mozilla-cloud-services-logger.git
 WORKDIR /mozilla-cloud-services-logger
-RUN pwd
 RUN python ./setup.py install
 
 EXPOSE 8080
