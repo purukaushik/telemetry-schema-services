@@ -1,6 +1,6 @@
 test:
   override:
-    - nose2
+    - docker run -t -i purush/telemetry-schema-services nose2
 machine:
   services:
     - docker
