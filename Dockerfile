@@ -10,9 +10,8 @@ RUN apt-get install -y python python-dev python-distribute python-pip
 # clone our repo
 #RUN git clone https://github.com/purukaushik/telemetry-schema-services.git
 # FIXME: remove this when testcases branch is finally merged into master
-#RUN git clone -b testcases https://github.com/purukaushik/telemetry-schema-services.git
+RUN git clone -b testcases https://github.com/purukaushik/telemetry-schema-services.git
 
-RUN git clone -b mozlog https://github.com/purukaushik/telemetry-schema-services.git
 # pip install requirements.txt
 RUN pip install -r /telemetry-schema-services/requirements.txt
 
