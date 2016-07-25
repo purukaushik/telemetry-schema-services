@@ -20,28 +20,28 @@ class TestCommons(unittest.TestCase):
     def test_get_doctypes(self):
         namespace = self.config["namespace"]
         docTypes = self.config["docTypes"]
-        result = self.helper.get_doctypes_versions(namespace=namespace,docType=None,logger=self.logger)
+        result = self.helper.get_doctypes_versions(namespace=namespace, docType=None, logger=self.logger)
         # check if result returned is a list
-        self.assertIsInstance(result,list)
+        self.assertIsInstance(result, list)
         # size must be 4 as we currently have 4 docTypes.
         self.assertEquals(len(result), 4)
         for item in result:
             # check if items in list returned are tuples
-            self.assertIsInstance(item,tuple)
+            self.assertIsInstance(item, tuple)
             # check if the tuples are of size 4 always!
             self.assertEquals(len(item), 4)
             # check if the 3,4th items are always None - as the request was for only docTypes
             self.assertIsNone(item[2])
             self.assertIsNone(item[3])
             # check if docType is in known types
-            self.assertIn(item[0],docTypes)
+            self.assertIn(item[0], docTypes)
 
     def test_get_versions(self):
         namespace = self.config["namespace"]
         docType_versions = self.config["docType_versions"]
 
         for docType,versions in docType_versions.items():
-            result = self.helper.get_doctypes_versions(namespace=namespace,docType=docType, logger=self.logger)
+            result = self.helper.get_doctypes_versions(namespace=namespace, docType=docType, logger=self.logger)
             # check if result is a list
             self.assertIsInstance(result,list)
             # check if result has same length as no of versions for that docType
@@ -57,7 +57,3 @@ class TestCommons(unittest.TestCase):
                 self.assertIsNotNone(item[3])
                 # check if version from commons service is same as expected in the test_config file
                 self.assertIn(item[0], versions, msg=item[0]+" not a version of " + docType)
-
-
-if __name__ == '__main__':
-    unittest.main()
