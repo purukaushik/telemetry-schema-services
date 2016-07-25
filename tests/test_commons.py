@@ -5,6 +5,7 @@ import unittest
 from mozschemas_common import SchemasLocalFilesHelper, gitcheckout
 import logging
 import json
+import os
 from os.path import isfile
 
 class TestCommons(unittest.TestCase):
@@ -13,7 +14,8 @@ class TestCommons(unittest.TestCase):
         self.path = '/mozilla-pipeline-schemas/'
         self.helper = SchemasLocalFilesHelper(self.path)
         self.logger = logging.getLogger(__name__)
-        self.config = json.load(open("test_config.json"))
+        __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        self.config = json.load(open(os.path.join(__location__, "config.json")))
         if not isfile(self.path):
             gitcheckout(self.logger)
 

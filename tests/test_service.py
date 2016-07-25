@@ -1,13 +1,17 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import json
 import mozschemas_service
 import unittest
 import flask
-
+import os
 
 class TestServiceApp(unittest.TestCase):
     def setUp(self):
         self.service_app = mozschemas_service.app.test_client()
-        self.config = json.load(open('test_config.json'))
+        __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        self.config = json.load(open(os.path.join(__location__, "config.json")))
 
     def test_file_end_point(self):
         self.is_endpoint_good('/file/', 'application/json')
@@ -50,7 +54,8 @@ class TestServiceApp(unittest.TestCase):
                     self.is_valid_json_in_upload(endpoint, valid_json)
 
                 if docType not in self.config['skip_invalid']:
-                    invalid_json = open('test_config.json')
+                    __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+                    invalid_json = open(os.path.join(__location__, "config.json"))
                     self.is_invalid_json_in_upload(endpoint, invalid_json=invalid_json)
 
                 if 'non_json' in self.config:
