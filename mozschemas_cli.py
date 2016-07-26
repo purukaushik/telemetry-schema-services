@@ -20,6 +20,10 @@ Options:
 from mozschemas_common import SchemasLocalFilesHelper
 from docopt import docopt
 import logging
+import git_checkout
+from mozilla_cloud_services_logger.formatters import JsonLogFormatter
+import sys
+
 
 if __name__ == "__main__":
     logger = logging.getLogger(__name__)
@@ -28,7 +32,15 @@ if __name__ == "__main__":
     # defaults
     namespace = 'telemetry'
     docType = 'main'
-    schelper = SchemasLocalFilesHelper('/mozilla-pipeline-schemas/')
+
+    handler = logging.StreamHandler(stream=sys.stdout)
+    logger.setLevel(logging.DEBUG)
+    handler.setFormatter(JsonLogFormatter(logger_name=__name__))
+    logger.addHandler(handler)
+    git_checkout.gitcheckout(logger)
+
+    schelper = SchemasLocalFilesHelper()
+
     if arguments['-n'] is not None:
         namespace = arguments['-n']
         

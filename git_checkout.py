@@ -8,6 +8,10 @@ import git, os
 import json
 import datetime
 import logging
+import sys
+from mozilla_cloud_services_logger.formatters import JsonLogFormatter
+
+
 
 def gitcheckout(logger):
     checkout(get_config(), logger)
@@ -17,25 +21,28 @@ def checkout(config, logger):
     Checkout from git with values from branch=config['branch'], remote_url=config['remote_url']
     """
     if os.path.isdir(config['os_dir']):
+        logger.debug('directory exists. will pull instead of clone...')
         fetch_branch(config, logger)
     else:
         logger.debug('cloning '+ config['remote_url'])
         try:
-            git.Git().clone(config['remote_url'])
+            os.mkdir(config['os_dir'])
+            git.Git().clone(config['remote_url'], config['os_dir'])
             fetch_branch(config, logger)
-        except git.exc.GitCommandError:
-            logger.warn('Git error. using local')
+        except git.exc.GitCommandError as err:
+            logger.error(err)
+            logger.warn('Git error while cloning. Using local')
             pass
         
 def fetch_branch(config, logger):
-    logger.debug('directory exists. will pull instead of clone...')
-    repo = git.Repo.init("./" + config['os_dir'])
+
+    repo = git.Repo.init(config['os_dir'])
     origin = repo.remotes.origin
     try:
         logger.debug("Fetching branch: " + config['branch'])
         origin.fetch(config['branch'])
         # git checkout branch
-        git.Git('./' + config['os_dir']).checkout(config['branch'])
+        git.Git(config['os_dir']).checkout(config['branch'])
         # git pull origin branch
         fetch_info =origin.pull(config['branch'])
         
@@ -45,12 +52,22 @@ def fetch_branch(config, logger):
         logger.debug('latest commit: ' + commit_msg)
         pass
     except git.exc.GitCommandError:
-        logger.warn("Git error. using local")
+        logger.warn("Git error while pulling latest. using local")
         pass
         
 def get_config():
-    return json.load(open('git_config.json'))
+    curr_dir = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+    config = json.load(open(os.path.join(curr_dir, 'git_config.json')))
+    if os.path.isfile(config['os_dir']):
+        config['os_dir'] = os.path.abspath(os.path.join(os.getcwd(), os.path.dirname(config['os_dir'])))
+        print config
+    return config
 
 if __name__ == '__main__':
 
-    gitcheckout(logging.getLogger(__name__))
+    logger = logging.getLogger(__name__)
+    handler = logging.StreamHandler(stream=sys.stdout)
+    logger.setLevel(logging.DEBUG)
+    handler.setFormatter(JsonLogFormatter(logger_name=__name__))
+    logger.addHandler(handler)
+    gitcheckout(logger)

@@ -26,10 +26,21 @@ from docopt import docopt
 from mozilla_cloud_services_logger.formatters import JsonLogFormatter
 import sys
 
+SCHEMAS_LOCAL_FILES_HELPER = SchemasLocalFilesHelper()
 ALLOWED_EXTENSIONS= set(['json'])
-CWD = os.path.dirname(os.path.realpath(__file__))
 
 app = Flask(__name__)
+
+@app.before_first_request
+def on_startup():
+    # setup logging
+    handler = logging.StreamHandler(stream=sys.stdout)
+    app.logger.setLevel(logging.DEBUG)
+    handler.setFormatter(JsonLogFormatter(logger_name=__name__))
+    app.logger.addHandler(handler)
+    # and checkout mozilla schemas repo
+    gitcheckout(app.logger)
+
 
 def throw_validation_error(validationError):
     app.logger.error("Error in validation.")
@@ -51,21 +62,21 @@ def allowed_file(filename):
 def api_root():
     return Response(open('README.md').read(), status=200, mimetype='text/plain')
 
-@app.route('/file/<path:path>', methods = ['GET'])
+@app.route('/file/<path:path>', methods = ['GET'], strict_slashes=False)
 def api_get_file(path):
-    return send_from_directory(CWD + '/mozilla-pipeline-schemas/', path)
+    return send_from_directory(SCHEMAS_LOCAL_FILES_HELPER.git_config['os_dir'], path)
 
-@app.route('/schema/<namespace>', methods=['GET'])
+@app.route('/schema/<namespace>', methods=['GET'], strict_slashes=False)
 def api_get_doctypes(namespace):
     try:
-        lst = SchemasLocalFilesHelper('/mozilla-pipeline-schemas/').get_doctypes_versions(namespace, None, app.logger)
+        lst = SCHEMAS_LOCAL_FILES_HELPER.get_doctypes_versions(namespace, None, app.logger)
     except OSError:
         return redirect(url_for('api_get_doctypes', namespace='telemetry'))
     return render_template('links.html', display_list = lst, listing = 'docTypes under ' + namespace)
 
-@app.route('/schema/<namespace>/<docType>', methods = ['GET'])
+@app.route('/schema/<namespace>/<docType>', methods = ['GET'], strict_slashes=False)
 def api_get_versions(namespace, docType):
-    lst = SchemasLocalFilesHelper('/mozilla-pipeline-schemas/').get_doctypes_versions(namespace, docType, app.logger)
+    lst = SCHEMAS_LOCAL_FILES_HELPER.get_doctypes_versions(namespace, docType, app.logger)
     return render_template('links.html', display_list = lst, listing = 'versions of ' + docType)
 
 @app.route('/schema/<namespace>/<docType>/<version>', methods = ['GET'])
@@ -78,24 +89,24 @@ def api_get_schema(namespace, docType, version):
             app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
     else:
         app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
-    return jsonify(json.load(SchemasLocalFilesHelper('/mozilla-pipeline-schemas/').get_schema_json(namespace, docType, version, app.logger)))
+    return jsonify(json.load(SCHEMAS_LOCAL_FILES_HELPER.get_schema_json(namespace, docType, version, app.logger)))
 
-@app.route('/validate/<namespace>', methods = ['GET'])
+@app.route('/validate/<namespace>', methods = ['GET'], strict_slashes=False)
 def api_validate_namespace(namespace):
     return redirect(url_for('api_get_doctypes',namespace=namespace))
 
-@app.route('/validate/<namespace>/<docType>', methods = ['GET'])
+@app.route('/validate/<namespace>/<docType>', methods = ['GET'], strict_slashes=False)
 def api_validate_doctype(namespace, docType):
     return redirect(url_for('api_get_versions',namespace=namespace,docType=docType))
 
-@app.route('/validate/<namespace>/<docType>/<version>', methods = ['GET', 'POST'])
+@app.route('/validate/<namespace>/<docType>/<version>', methods = ['GET', 'POST'], strict_slashes=False)
 def api_get_schema_w_version(namespace, docType, version):
     # _. assemble payload from the parameters
     app.logger.debug(" api_get_schema method start")
     app.logger.debug(" assembling fileName from route")
     # construct file name from GET uri and search for schema in cwd/mozilla-pipeline-schemas/
     # assumes git clones into cwd 
-    schema_json = SchemasLocalFilesHelper('/mozilla-pipeline-schemas/').get_schema_json(namespace, docType, version, app.logger)
+    schema_json = SCHEMAS_LOCAL_FILES_HELPER.get_schema_json(namespace, docType, version, app.logger)
     if request.method == 'POST':
         main_schema = json.load(schema_json)
         app.logger.debug(" request is POST")
@@ -167,10 +178,4 @@ if __name__ == '__main__':
     host = arguments.get('--host', '0.0.0.0')
     port = arguments.get('-p', 8080)
 
-    handler = logging.StreamHandler(stream=sys.stdout)
-    app.logger.setLevel(logging.DEBUG)
-    handler.setFormatter(JsonLogFormatter(logger_name=__name__))
-    app.logger.addHandler(handler)
-
-    gitcheckout(app.logger)
-    app.run(host = host, port = port, threaded = True)
+    app.run(host=host, port=port, threaded=True)

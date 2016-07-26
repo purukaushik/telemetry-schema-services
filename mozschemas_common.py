@@ -5,15 +5,13 @@ import re
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-CWD = os.path.dirname(os.path.realpath(__file__))
+
 
 class SchemasLocalFilesHelper:
 
     def __init__(self):
-        self.schema_base_path = CWD + '/mozilla-pipeline-schemas/'
-
-    def __init__(self, schemas_dir_path):
-        self.schema_base_path = CWD + schemas_dir_path
+        self.git_config = get_config()
+        self.schema_base_path = self.git_config['os_dir']
 
     def get_schema(self, fileName, logger):
         """ Locate and return the schema specified by full path in fileName.

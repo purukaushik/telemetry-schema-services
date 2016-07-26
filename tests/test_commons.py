@@ -11,13 +11,12 @@ from os.path import isfile
 class TestCommons(unittest.TestCase):
 
     def setUp(self):
-        self.path = '/mozilla-pipeline-schemas/'
-        self.helper = SchemasLocalFilesHelper(self.path)
+
+        self.helper = SchemasLocalFilesHelper()
         self.logger = logging.getLogger(__name__)
         __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
         self.config = json.load(open(os.path.join(__location__, "config.json")))
-        if not isfile(self.path):
-            gitcheckout(self.logger)
+        gitcheckout(self.logger)
 
     def test_get_doctypes(self):
         namespace = self.config["namespace"]
