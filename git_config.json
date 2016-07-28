@@ -1,0 +1,5 @@
+{
+    "remote_url": "https://github.com/purukaushik/mozilla-pipeline-schemas.git",
+    "branch" : "common",
+    "os_dir" : "./mozilla-pipeline-schemas"
+}

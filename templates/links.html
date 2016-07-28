@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+<head></head>
+<body>
+<h2>{{ listing }}<br/></h2>
+<ul style="list-style: none;">
+{% for name, schema, validate, minify in display_list %}
+    <li>{{ name }} <a href="{{ schema }}">schema</a>
+        {% if minify is not none %}
+            <a href="{{ minify }}">minify</a>
+        {% endif %}
+        {% if validate is not none %}
+            <a href="{{ validate }}">validate</a><br/>
+        {% endif %}
+    </li>
+{% endfor %}
+</ul>
+</body>
+</html>
