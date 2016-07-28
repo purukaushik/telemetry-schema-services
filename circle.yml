@@ -1,15 +1,15 @@
 test:
   override:
-    - docker run -t -i purush/telemetry-schema-services nose2
+    - docker run -t -i purush/telemetry-schema-service nose2
 machine:
   services:
     - docker
 dependencies:
   override:
-    - docker build -t purush/telemetry-schema-services .
+    - docker build -t purush/telemetry-schema-service .
 deployment:
   hub:
     branch: testcases
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      - docker push purush/telemetry-schema-services
+      - docker push purush/telemetry-schema-service

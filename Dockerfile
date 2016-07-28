@@ -7,10 +7,10 @@ RUN apt-get update
 RUN apt-get install -y tar git curl wget dialog net-tools build-essential python python-dev python-distribute python-pip
 
 # add project directory
-ADD . /telemetry-schema-services/
+ADD . /telemetry-schema-service/
 
 # pip install requirements.txt
-RUN pip install -r /telemetry-schema-services/requirements.txt
+RUN pip install -r /telemetry-schema-service/requirements.txt
 
 # package for logging in mozlog format
 RUN git clone https://github.com/mozilla/mozilla-cloud-services-logger.git
@@ -19,13 +19,10 @@ RUN git clone https://github.com/mozilla/mozilla-cloud-services-logger.git
 EXPOSE 8080
 
 # make mozschemas_service.py runnable
-RUN chmod +x /telemetry-schema-services/mozschemas_service.py
-
-# run gunicorn
-#CMD /telemetry-schema-services/mozschemas_service.py -p 8080 --host='0.0.0.0'
+RUN chmod +x /telemetry-schema-service/mozschemas_service.py
 
 # workdir
-WORKDIR /telemetry-schema-services
+WORKDIR /telemetry-schema-service
 
-
+# run gunicorn
 CMD gunicorn -w 4 -b 0.0.0.0:8080 mozschemas_service:app
