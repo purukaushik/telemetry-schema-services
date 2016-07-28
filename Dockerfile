@@ -12,9 +12,6 @@ ADD . /telemetry-schema-service/
 # pip install requirements.txt
 RUN pip install -r /telemetry-schema-service/requirements.txt
 
-# package for logging in mozlog format
-RUN git clone https://github.com/mozilla/mozilla-cloud-services-logger.git
-
 # exposing 8080 for flask app
 EXPOSE 8080
 
