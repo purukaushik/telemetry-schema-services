@@ -26,6 +26,6 @@ RUN chmod +x /telemetry-schema-services/mozschemas_service.py
 
 # workdir
 WORKDIR /telemetry-schema-services
-RUN pwd
+
 
 CMD gunicorn -w 4 -b 0.0.0.0:8080 mozschemas_service:app
