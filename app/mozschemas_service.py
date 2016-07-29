@@ -2,6 +2,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 """Schema Service Core.
 Starts the core python schema hosting/validation web service API.
 Usage:
@@ -13,18 +14,21 @@ Options:
 --host=<host>   Hostname [default: 0.0.0.0]
 -p <port>       Port number to run flask on [default: 8080]
 """
-from flask import Flask, request, Response, redirect, render_template, flash, jsonify, send_from_directory, url_for
-import os
+
+import StringIO
+import gzip
 import json
+import logging
+import os
+import sys
+
+from docopt import docopt
+from flask import Flask, request, Response, redirect, render_template, jsonify, send_from_directory, url_for
 from jsonschema import validate, ValidationError
+from mozilla_cloud_services_logger.formatters import JsonLogFormatter
+
 from git_checkout import gitcheckout
 from mozschemas_common import SchemasLocalFilesHelper
-import gzip
-import StringIO
-import logging
-from docopt import docopt
-from mozilla_cloud_services_logger.formatters import JsonLogFormatter
-import sys
 
 SCHEMAS_LOCAL_FILES_HELPER = SchemasLocalFilesHelper()
 ALLOWED_EXTENSIONS= set(['json'])
@@ -40,7 +44,7 @@ def on_startup():
     handler.setFormatter(JsonLogFormatter(logger_name=__name__))
     app.logger.addHandler(handler)
     # and checkout mozilla schemas repo
-    gitcheckout(app.logger)
+    gitcheckout()
 
 
 def throw_validation_error(validationError):
@@ -80,14 +84,14 @@ def api_get_file(path):
 @app.route('/schema/<namespace>', methods=['GET'], strict_slashes=False)
 def api_get_doctypes(namespace):
     try:
-        lst = SCHEMAS_LOCAL_FILES_HELPER.get_doctypes_versions(namespace, None, app.logger)
+        lst = SCHEMAS_LOCAL_FILES_HELPER.get_doctypes_versions(namespace, None)
     except OSError:
         return redirect(url_for('api_get_doctypes', namespace='telemetry'))
     return render_template('links.html', display_list = lst, listing ='docTypes under ' + namespace)
 
 @app.route('/schema/<namespace>/<docType>', methods = ['GET'], strict_slashes=False)
 def api_get_versions(namespace, docType):
-    lst = SCHEMAS_LOCAL_FILES_HELPER.get_doctypes_versions(namespace, docType, app.logger)
+    lst = SCHEMAS_LOCAL_FILES_HELPER.get_doctypes_versions(namespace, docType)
     return render_template('links.html', display_list = lst, listing ='versions of ' + docType)
 
 @app.route('/schema/<namespace>/<docType>/<version>', methods = ['GET'])
@@ -100,7 +104,7 @@ def api_get_schema(namespace, docType, version):
             app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
     else:
         app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
-    return jsonify(json.load(SCHEMAS_LOCAL_FILES_HELPER.get_schema_json(namespace, docType, version, app.logger)))
+    return jsonify(json.load(SCHEMAS_LOCAL_FILES_HELPER.get_schema_json(namespace, docType, version)))
 
 @app.route('/validate/<namespace>', methods = ['GET'], strict_slashes=False)
 def api_validate_namespace(namespace):
@@ -117,7 +121,7 @@ def api_get_schema_w_version(namespace, docType, version):
     app.logger.debug(" assembling fileName from route")
     # construct file name from GET uri and search for schema in cwd/mozilla-pipeline-schemas/
     # assumes git clones into cwd 
-    schema_json = SCHEMAS_LOCAL_FILES_HELPER.get_schema_json(namespace, docType, version, app.logger)
+    schema_json = SCHEMAS_LOCAL_FILES_HELPER.get_schema_json(namespace, docType, version)
     if request.method == 'POST':
         main_schema = json.load(schema_json)
         app.logger.debug(" request is POST")

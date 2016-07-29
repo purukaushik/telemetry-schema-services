@@ -7,34 +7,32 @@
 import git, os
 import json
 import datetime
-import logging
-import sys
-from mozilla_cloud_services_logger.formatters import JsonLogFormatter
+import mozschemas_logging
 
+logger = mozschemas_logging.getLogger(__name__)
 
-
-def gitcheckout(logger):
-    checkout(get_config(), logger)
+def gitcheckout():
+    checkout(get_config())
     
-def checkout(config, logger):
+def checkout(config):
     """
     Checkout from git with values from branch=config['branch'], remote_url=config['remote_url']
     """
     if os.path.isdir(config['os_dir']):
         logger.debug('directory exists. will pull instead of clone...')
-        fetch_branch(config, logger)
+        fetch_branch(config)
     else:
         logger.debug('cloning '+ config['remote_url'])
         try:
             os.mkdir(config['os_dir'])
             git.Git().clone(config['remote_url'], config['os_dir'])
-            fetch_branch(config, logger)
+            fetch_branch(config)
         except git.exc.GitCommandError as err:
             logger.error(err)
             logger.warn('Git error while cloning. Using local')
             pass
         
-def fetch_branch(config, logger):
+def fetch_branch(config):
 
     repo = git.Repo.init(config['os_dir'])
     origin = repo.remotes.origin
@@ -64,10 +62,4 @@ def get_config():
     return config
 
 if __name__ == '__main__':
-
-    logger = logging.getLogger(__name__)
-    handler = logging.StreamHandler(stream=sys.stdout)
-    logger.setLevel(logging.DEBUG)
-    handler.setFormatter(JsonLogFormatter(logger_name=__name__))
-    logger.addHandler(handler)
-    gitcheckout(logger)
+    gitcheckout()

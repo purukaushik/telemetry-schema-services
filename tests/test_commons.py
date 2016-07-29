@@ -2,11 +2,12 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import json
-import logging
 import os
 import unittest
 
-from app.mozschemas_common import SchemasLocalFilesHelper, gitcheckout
+from app.git_checkout import gitcheckout
+from app.mozschemas_common import SchemasLocalFilesHelper
+from app.mozschemas_logging import getLogger
 
 
 class TestCommons(unittest.TestCase):
@@ -14,15 +15,15 @@ class TestCommons(unittest.TestCase):
     def setUp(self):
 
         self.helper = SchemasLocalFilesHelper()
-        self.logger = logging.getLogger(__name__)
+        self.logger = getLogger(__name__)
         __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
         self.config = json.load(open(os.path.join(__location__, "config.json")))
-        gitcheckout(self.logger)
+        gitcheckout()
 
     def test_get_doctypes(self):
         namespace = self.config["namespace"]
         docTypes = self.config["docTypes"]
-        result = self.helper.get_doctypes_versions(namespace=namespace, docType=None, logger=self.logger)
+        result = self.helper.get_doctypes_versions(namespace=namespace, docType=None)
         # check if result returned is a list
         self.assertIsInstance(result, list)
         # size must be 4 as we currently have 4 docTypes.
@@ -43,7 +44,7 @@ class TestCommons(unittest.TestCase):
         docType_versions = self.config["docType_versions"]
 
         for docType,versions in docType_versions.items():
-            result = self.helper.get_doctypes_versions(namespace=namespace, docType=docType, logger=self.logger)
+            result = self.helper.get_doctypes_versions(namespace=namespace, docType=docType)
             # check if result is a list
             self.assertIsInstance(result,list)
             # check if result has same length as no of versions for that docType

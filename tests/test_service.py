@@ -16,6 +16,18 @@ class TestServiceApp(unittest.TestCase):
         __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
         self.config = json.load(open(os.path.join(__location__, "config.json")))
 
+    def test_version(self):
+        response = self.service_app.get('__version__')
+        self.is_response_good(response, 200, 'application/json')
+
+    def test_hearbeat(self):
+        response = self.service_app.get('__heartbeat__')
+        self.is_response_good(response,200, 'text/html')
+
+    def test_lbhearbeat(self):
+        response = self.service_app.get('__lbheartbeat__')
+        self.is_response_good(response, 200, 'text/html')
+
     def test_file_end_point(self):
         self.is_endpoint_good('/file/', 'application/json')
 
