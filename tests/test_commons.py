@@ -1,12 +1,13 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-import unittest
-from mozschemas_common import SchemasLocalFilesHelper, gitcheckout
-import logging
 import json
+import logging
 import os
-from os.path import isfile
+import unittest
+
+from app.mozschemas_common import SchemasLocalFilesHelper, gitcheckout
+
 
 class TestCommons(unittest.TestCase):
 

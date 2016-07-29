@@ -17,13 +17,14 @@ Options:
 -n namespace -d doctype -v version Show schema @ namespace/docType/version
 """
 
-from mozschemas_common import SchemasLocalFilesHelper
-from docopt import docopt
 import logging
-import git_checkout
-from mozilla_cloud_services_logger.formatters import JsonLogFormatter
 import sys
 
+from docopt import docopt
+from mozilla_cloud_services_logger.formatters import JsonLogFormatter
+
+import git_checkout
+from mozschemas_common import SchemasLocalFilesHelper
 
 if __name__ == "__main__":
     logger = logging.getLogger(__name__)

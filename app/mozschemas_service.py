@@ -28,6 +28,7 @@ import sys
 
 SCHEMAS_LOCAL_FILES_HELPER = SchemasLocalFilesHelper()
 ALLOWED_EXTENSIONS= set(['json'])
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 app = Flask(__name__)
 
@@ -58,13 +59,11 @@ def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
-@app.route('/')
-def api_root():
-    return Response(open('README.md').read(), status=200, mimetype='text/plain')
 
 @app.route('/__version__', strict_slashes=False)
 def api_version():
-    return send_from_directory('', 'version.json')
+
+    return send_from_directory(PROJECT_ROOT, 'version.json')
 
 @app.route('/__lbheartbeat__', strict_slashes=False)
 def api_lbheartbeat():
@@ -84,12 +83,12 @@ def api_get_doctypes(namespace):
         lst = SCHEMAS_LOCAL_FILES_HELPER.get_doctypes_versions(namespace, None, app.logger)
     except OSError:
         return redirect(url_for('api_get_doctypes', namespace='telemetry'))
-    return render_template('links.html', display_list = lst, listing = 'docTypes under ' + namespace)
+    return render_template('links.html', display_list = lst, listing ='docTypes under ' + namespace)
 
 @app.route('/schema/<namespace>/<docType>', methods = ['GET'], strict_slashes=False)
 def api_get_versions(namespace, docType):
     lst = SCHEMAS_LOCAL_FILES_HELPER.get_doctypes_versions(namespace, docType, app.logger)
-    return render_template('links.html', display_list = lst, listing = 'versions of ' + docType)
+    return render_template('links.html', display_list = lst, listing ='versions of ' + docType)
 
 @app.route('/schema/<namespace>/<docType>/<version>', methods = ['GET'])
 def api_get_schema(namespace, docType, version):
