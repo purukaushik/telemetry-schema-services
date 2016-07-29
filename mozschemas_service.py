@@ -62,6 +62,18 @@ def allowed_file(filename):
 def api_root():
     return Response(open('README.md').read(), status=200, mimetype='text/plain')
 
+@app.route('/__version__', strict_slashes=False)
+def api_version():
+    return send_from_directory('', 'version.json')
+
+@app.route('/__lbheartbeat__', strict_slashes=False)
+def api_lbheartbeat():
+    return Response('', status=200)
+
+@app.route('/__heartbeat__', strict_slashes=False)
+def api_heartbeat():
+    return Response('', status=200)
+
 @app.route('/file/<path:path>', methods = ['GET'], strict_slashes=False)
 def api_get_file(path):
     return send_from_directory(SCHEMAS_LOCAL_FILES_HELPER.git_config['os_dir'], path)
