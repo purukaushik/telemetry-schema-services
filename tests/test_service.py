@@ -13,8 +13,8 @@ from app import mozschemas_service
 class TestServiceApp(unittest.TestCase):
     def setUp(self):
         self.service_app = mozschemas_service.app.test_client()
-        __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-        self.config = json.load(open(os.path.join(__location__, "config.json")))
+        curr_dir = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        self.config = json.load(open(os.path.join(curr_dir, "config.json")))
 
     def test_version(self):
         response = self.service_app.get('__version__')

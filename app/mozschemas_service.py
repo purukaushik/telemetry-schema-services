@@ -3,18 +3,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-"""Schema Service Core.
-Starts the core python schema hosting/validation web service API.
-Usage:
-mozschemas_service.py [-p <port>] [--host=<host>]
-mozschemas_service.py (-h | --help)
-    
-Options:
--h --help       Show this screen.
---host=<host>   Hostname [default: 0.0.0.0]
--p <port>       Port number to run flask on [default: 8080]
-"""
-
 import StringIO
 import gzip
 import json
@@ -22,7 +10,6 @@ import logging
 import os
 import sys
 
-from docopt import docopt
 from flask import Flask, request, Response, redirect, render_template, jsonify, send_from_directory, url_for
 from jsonschema import validate, ValidationError
 from mozilla_cloud_services_logger.formatters import JsonLogFormatter
@@ -187,10 +174,3 @@ def not_found(error = None):
         'message': 'Not Found: ' + request.url,
     }
     return Response(json.dumps(message), status=404, mimetype='application/json')
-
-if __name__ == '__main__':
-    arguments = docopt(__doc__, version = 'Schema service v0.1')
-    host = arguments.get('--host', '0.0.0.0')
-    port = arguments.get('-p', 8080)
-
-    app.run(host=host, port=port, threaded=True)

@@ -28,10 +28,8 @@ def checkout(config):
             git.Git().clone(config['remote_url'], config['os_dir'])
             fetch_branch(config)
         except git.exc.GitCommandError as err:
-            logger.error(err)
-            logger.warn('Git error while cloning. Using local')
-            pass
-        
+            logger.exception('Git error while cloning. Using local')
+
 def fetch_branch(config):
 
     repo = git.Repo.init(config['os_dir'])
@@ -48,17 +46,14 @@ def fetch_branch(config):
         headcommit = fetch_info[0].ref.commit
         commit_msg = repr(headcommit.author) + "  " + datetime.datetime.fromtimestamp(int(headcommit.authored_date)).strftime('%Y-%m-%d %H:%M:%S') +  "  " + headcommit.message 
         logger.debug('latest commit: ' + commit_msg)
-        pass
     except git.exc.GitCommandError:
-        logger.warn("Git error while pulling latest. using local")
-        pass
+        logger.exception('Git error while cloning. Using local')
         
 def get_config():
     curr_dir = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     config = json.load(open(os.path.join(curr_dir, 'git_config.json')))
     if os.path.isfile(config['os_dir']):
         config['os_dir'] = os.path.abspath(os.path.join(os.getcwd(), os.path.dirname(config['os_dir'])))
-        print config
     return config
 
 if __name__ == '__main__':

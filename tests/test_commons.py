@@ -7,7 +7,6 @@ import unittest
 
 from app.git_checkout import gitcheckout
 from app.mozschemas_common import SchemasLocalFilesHelper
-from app.mozschemas_logging import getLogger
 
 
 class TestCommons(unittest.TestCase):
@@ -15,9 +14,8 @@ class TestCommons(unittest.TestCase):
     def setUp(self):
 
         self.helper = SchemasLocalFilesHelper()
-        self.logger = getLogger(__name__)
-        __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-        self.config = json.load(open(os.path.join(__location__, "config.json")))
+        curr_dir = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+        self.config = json.load(open(os.path.join(curr_dir, "config.json")))
         gitcheckout()
 
     def test_get_doctypes(self):
