@@ -1,7 +1,0 @@
-flask
-jsonschema
-gitpython
-docopt
-nose2
-mozilla-cloud-services-logger
-gunicorn
