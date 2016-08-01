@@ -3,5 +3,5 @@ jsonschema
 gitpython
 docopt
 nose2
-git+https://github.com/mozilla/mozilla-cloud-services-logger.git#egg=mozilla-cloud-services-logger
+mozilla-cloud-services-logger
 gunicorn

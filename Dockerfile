@@ -15,11 +15,9 @@ RUN pip install -r /telemetry-schema-service/requirements.txt
 # exposing 8080 for flask app
 EXPOSE 8080
 
-# make mozschemas_service.py runnable
-RUN chmod +x /telemetry-schema-service/app/mozschemas_service.py
-
 # workdir
 WORKDIR /telemetry-schema-service/app
 
 # run gunicorn
 CMD gunicorn -w 4 -b 0.0.0.0:8080 mozschemas_service:app
+
