@@ -27,6 +27,7 @@ Fetches `<filename>.json` from `/telemetry` folder in file system location speci
 ### /validate service
 1. **Endpoint** - `/validate/<namespace>/<docType>/<version>`
     Pulls up the psuedo file upload and validate HTML page.
+
 2. Level-up endpoints redirect to `/schema/<namespace>/[<docType>]` endpoints. 
 
 
