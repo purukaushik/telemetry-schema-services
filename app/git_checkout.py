@@ -55,6 +55,3 @@ def get_config():
     if os.path.isfile(config['os_dir']):
         config['os_dir'] = os.path.abspath(os.path.join(os.getcwd(), os.path.dirname(config['os_dir'])))
     return config
-
-if __name__ == '__main__':
-    gitcheckout()
