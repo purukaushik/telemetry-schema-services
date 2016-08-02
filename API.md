@@ -28,3 +28,14 @@ Fetches `<filename>.json` from `/telemetry` folder in file system location speci
 1. **Endpoint** - `/validate/<namespace>/<docType>/<version>`
     Pulls up the psuedo file upload and validate HTML page.
 2. Level-up endpoints redirect to `/schema/<namespace>/[<docType>]` endpoints. 
+
+
+### Hindsight Pipeline Ingestion integration CLI ideas
+
+1. Having inlining in service:
+    1. Have a `/schema/telemetry/<docType>/<version>?inline=true` service option. 
+    2. telemetry-schema-service commons to have [ref-resolver](https://github.com/purukaushik/ref-resolver/blob/master/ref_resolver.py) to resolve $refs and inlining
+    3. Recursively wget all *.json from `/schema/telemetry/`
+2. Having inlining in pipeline side script:
+    1. Grab all schema jsons by hitting the `/file/` endpoint
+    2. Run [ref-resolver](https://github.com/purukaushik/ref-resolver/blob/master/ref_resolver.py) and inline each schema obtained.
