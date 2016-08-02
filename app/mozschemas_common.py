@@ -1,39 +1,41 @@
-import os, json, logging
-from os.path import isfile,join
-from git_checkout import gitcheckout, get_config, checkout
-import re
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-CWD = os.path.dirname(os.path.realpath(__file__))
+
+import os
+import re
+from os.path import isfile,join
+
+import mozschemas_logging
+from git_checkout import get_config, checkout
+
 
 class SchemasLocalFilesHelper:
 
     def __init__(self):
-        self.schema_base_path = CWD + '/mozilla-pipeline-schemas/'
+        self.git_config = get_config()
+        self.schema_base_path = self.git_config['os_dir']
+        self.logger = mozschemas_logging.getLogger(__name__)
 
-    def __init__(self, schemas_dir_path):
-        self.schema_base_path = CWD + schemas_dir_path
-
-    def get_schema(self, fileName, logger):
+    def get_schema(self, fileName):
         """ Locate and return the schema specified by full path in fileName.
             Returns: a file object of the schema.
         """
-        logger.debug('Fetching file from :' + fileName)
+        self.logger.debug('Fetching file from :' + fileName)
         return open(fileName)
 
-    def get_schema_json(self, namespace, docType, version, logger):
+    def get_schema_json(self, namespace, docType, version):
         """ Construct full path of schema requested at /namespace/docType/version to /namespace/docType.version.schema.json and return the json file.
             Returns: a file object of the schema
         """
         git_url_suffix = namespace + '/' + docType + '.' + version + '.schema.json'
         schema_file = self.schema_base_path + git_url_suffix
 
-        logger.debug("Fetching and reading file: " + schema_file)
-        schema_json = self.get_schema(schema_file, logger)
+        self.logger.debug("Fetching and reading file: " + schema_file)
+        schema_json = self.get_schema(schema_file)
         return schema_json
 
-    def get_doctypes_versions(self, namespace, docType, logger):
+    def get_doctypes_versions(self, namespace, docType):
         """ Returns one of two lists:
             1. If both namespace and docType is provided returns list of versions of schemas under namespace/docType
                 The list contains tuples of the form-  ( <version:Int>, <URI-endpoint-to-schema:String>, <URI-endpoint-to-validate-page:String>, <URI-endpoint-to-minify-schema:String  )
@@ -52,7 +54,7 @@ class SchemasLocalFilesHelper:
                 version_list.append(lst_item)
         else:
             for file in files:
-                logger.debug( " looking at : " + file)
+                self.logger.debug( " looking at : " + file)
                 m = re.search('^' + docType+'\.'+'([0-9])\.',file)
                 if m is not None:
                     version = m.group(1).replace('.','')

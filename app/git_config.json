@@ -1,0 +1,5 @@
+{
+    "remote_url": "https://github.com/mreid-moz/mozilla-pipeline-schemas.git",
+    "branch" : "common",
+    "os_dir" : "/tmp/mozilla-pipeline-schemas/"
+}

@@ -17,37 +17,43 @@ Options:
 -n namespace -d doctype -v version Show schema @ namespace/docType/version
 """
 
-from mozschemas_common import SchemasLocalFilesHelper
 from docopt import docopt
-import logging
+
+import git_checkout
+import mozschemas_logging
+from mozschemas_common import SchemasLocalFilesHelper
 
 if __name__ == "__main__":
-    logger = logging.getLogger(__name__)
+    logger = mozschemas_logging.getLogger(__name__)
     arguments = docopt(__doc__, version = 'CLI version v0.0')
 
     # defaults
     namespace = 'telemetry'
     docType = 'main'
-    schelper = SchemasLocalFilesHelper('/mozilla-pipeline-schemas/')
+
+    git_checkout.gitcheckout()
+
+    schelper = SchemasLocalFilesHelper()
+
     if arguments['-n'] is not None:
         namespace = arguments['-n']
         
         docType = arguments['-d']
         version = arguments['-v']
-        lst = schelper.get_doctypes_versions(namespace, docType, logger)
+        lst = schelper.get_doctypes_versions(namespace, docType)
         versions = list()
         for doctype_version, u1, u2, u3 in lst:
             versions.append(doctype_version)
         if version is not None:
             if version in versions:
-                print schelper.get_schema_json(namespace, docType, version, logger).read()
+                print schelper.get_schema_json(namespace, docType, version).read()
             else:
                 print "No such version. Try one of these:\n"
                 print versions
         else:
             if len(versions)==0:
                 print "No such docType. Try one of these:\n"
-                lst = schelper.get_doctypes_versions(namespace, None, logger)
+                lst = schelper.get_doctypes_versions(namespace, None)
                 for doctype_version, u1, u2, u3 in lst:
                     print doctype_version
             else:
