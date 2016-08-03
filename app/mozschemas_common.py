@@ -8,7 +8,8 @@ from os.path import isfile,join
 
 import mozschemas_logging
 from git_checkout import get_config, checkout
-
+from ref_resolver.ref_resolver import RefResolver
+import json
 
 class SchemasLocalFilesHelper:
 
@@ -17,6 +18,19 @@ class SchemasLocalFilesHelper:
         self.schema_base_path = self.git_config['os_dir']
         self.logger = mozschemas_logging.getLogger(__name__)
 
+    def get_inlined_schema(self, filename):
+        """ Resolve $refs recursively and return an inlined schema.
+        :param filename: schema to be resolved
+        :return: json dictionary
+        """
+        self.logger.debug('Inlining ' + filename)
+        json_file = json.load(open(filename))
+        id = None
+        if 'id' in json_file:
+            id = json_file['id']
+            RefResolver(id).resolve(json_file)
+        return json_file
+
     def get_schema(self, fileName):
         """ Locate and return the schema specified by full path in fileName.
             Returns: a file object of the schema.
@@ -24,7 +38,7 @@ class SchemasLocalFilesHelper:
         self.logger.debug('Fetching file from :' + fileName)
         return open(fileName)
 
-    def get_schema_json(self, namespace, docType, version):
+    def get_schema_json(self, namespace, docType, version, inline=False):
         """ Construct full path of schema requested at /namespace/docType/version to /namespace/docType.version.schema.json and return the json file.
             Returns: a file object of the schema
         """
@@ -32,7 +46,10 @@ class SchemasLocalFilesHelper:
         schema_file = self.schema_base_path + git_url_suffix
 
         self.logger.debug("Fetching and reading file: " + schema_file)
-        schema_json = self.get_schema(schema_file)
+        if inline:
+            schema_json = self.get_inlined_schema(schema_file)
+        else:
+            schema_json = self.get_schema(schema_file)
         return schema_json
 
     def get_doctypes_versions(self, namespace, docType):
@@ -50,7 +67,7 @@ class SchemasLocalFilesHelper:
             for file in files:
                 m = re.search('^[A-Za-z]*\.', file)
                 docType = m.group().replace('.', '')
-                lst_item = (docType, '/schema/' + namespace + '/' + docType, None, None)
+                lst_item = self.make(docType, '/schema/' + namespace + '/' + docType, None, None, None)
                 version_list.append(lst_item)
         else:
             for file in files:
@@ -60,11 +77,19 @@ class SchemasLocalFilesHelper:
                     version = m.group(1).replace('.','')
                     schema = '/schema/' + namespace + '/' + docType + '/' + version
                     minify = schema + '?minify=true'
-                    lst_item = (version, schema, '/validate/' + namespace + "/" + docType + "/" + version, minify)
-
+                    inline = schema + '?inline=true'
+                    lst_item = self.make(version, schema, '/validate/' + namespace + "/" + docType + "/" + version, minify, inline)
                     version_list.append(lst_item)
-        return version_list
+        return { "doc_list" : version_list }
 
+    def make(self, document, schema, validate, minify, inline):
+        return {
+            "document": document,
+            "schema" : schema,
+            "validate" : validate,
+            "minify" : minify,
+            "inline" : inline
+        }
 def checkout_branch(branch):
     config = get_config()
     config['branch'] = branch
