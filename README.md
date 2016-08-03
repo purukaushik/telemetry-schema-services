@@ -10,21 +10,28 @@ Service API to retrieve telemetry schemas and validate them against incoming jso
 The service is a Flask app that runs in a [Gunicorn](http://gunicorn.org/#quickstart) WSGI http server. 
 
 1. Clone the repository and cd in
+
     ```
     git clone https://github.com/purukaushik/telemetry-schema-service.git
     cd telemetry-schema-service    
     ```
+    
 2. Install python dependencies :
+
     ```
     pip install -r requirements.txt
     ```
+    
 3. Set git checkout path in `os_dir` in [`git_config.json`](https://github.com/purukaushik/telemetry-schema-service/blob/master/app/git_config.json#L4)
 
 4. Run nose tests
+
     ```
     nose2
     ```
+    
 5. Run Gunicorn
+
     ```
     gunicorn -w 4 -b 0.0.0.0:8080 mozschemas_service:app
     ```
@@ -34,12 +41,15 @@ The app is built into a docker container and hence the only prerequisite is dock
 
 
 1. Clone the repository and cd in
+
     ```
     git clone https://github.com/purukaushik/telemetry-schema-service.git
     cd telemetry-schema-service    
     ```
+    
 2. Set git checkout path in 'os_dir' in [`git_config.json`](https://github.com/purukaushik/telemetry-schema-service/blob/master/app/git_config.json#L4)
 3.  Docker build in /telemetry-schema-service:
+
     ```
     docker build -t telemetry-schema-service .
     ```
