@@ -5,21 +5,66 @@
 
 
 Service API to retrieve telemetry schemas and validate them against incoming json.
-	
-## Running the service ##
 
-  Schema service can be started with the following options:
+## Building and Running the service standalone
+The service is a Flask app that runs in a [Gunicorn](http://gunicorn.org/#quickstart) WSGI http server. 
 
-    ./mozschemas_service.py [-p <port>] [--host=<host>]
-    ./mozschemas_service.py (-h | --help)
-    Options:
-    -h --help       Show this screen.
-    --host=<host>   Hostname [default: 127.0.0.1]
-    -p <port>       Port number to run flask on [default: 5000]
+1. Clone the repository and cd in
+
+    ```
+    git clone https://github.com/purukaushik/telemetry-schema-service.git
+    cd telemetry-schema-service    
+    ```
+    
+2. Install python dependencies :
+
+    ```
+    pip install -r requirements.txt
+    ```
+    
+3. Set git checkout path in `os_dir` in [`git_config.json`](https://github.com/purukaushik/telemetry-schema-service/blob/master/app/git_config.json#L4)
+
+4. Run nose tests
+
+    ```
+    nose2
+    ```
+    
+5. Run Gunicorn
+
+    ```
+    gunicorn -w 4 -b 0.0.0.0:8080 mozschemas_service:app
+    ```
+
+## Building the service into a Docker image
+The app is built into a docker container and hence the only prerequisite is docker, installed and running on your system.
 
 
- 
-## Usage ##
+1. Clone the repository and cd in
+
+    ```
+    git clone https://github.com/purukaushik/telemetry-schema-service.git
+    cd telemetry-schema-service    
+    ```
+    
+2. Set git checkout path in 'os_dir' in [`git_config.json`](https://github.com/purukaushik/telemetry-schema-service/blob/master/app/git_config.json#L4)
+3.  Docker build in /telemetry-schema-service:
+
+    ```
+    docker build -t telemetry-schema-service .
+    ```
+
+## Running the service in Docker container##
+The default logging is directed to `stdout`. In order to use `docker logs` run with:
+
+```
+docker run --log-driver=json-file -p 8080:8080 telemetry-schema-service & 
+```
+
+## API ##
+    
+  Once the flask app is up and running, either in Gunicorn or in the Docker container, the schemas can be requested.
+  
   Schemas are retrieved from [this github repo](https://github.com/mozilla-services/mozilla-pipeline-schemas).
   
   
@@ -54,10 +99,10 @@ Service API to retrieve telemetry schemas and validate them against incoming jso
 ## CLI version
 To run the schema retrieval as a CLI program from terminal, the following will be useful:
 
-    ./mozschemas_cli.py [(-n <namespace>)]
-    ./mozschemas_cli.py [(-n <namespace>  -d <doctype>)]
-    ./mozschemas_cli.py [(-n <namespace>  -d <doctype> -v <version>)]
-    ./mozschemas_cli.py (-h | --help)
+    ./app/mozschemas_cli.py [(-n <namespace>)]
+    ./app/mozschemas_cli.py [(-n <namespace>  -d <doctype>)]
+    ./app/mozschemas_cli.py [(-n <namespace>  -d <doctype> -v <version>)]
+    ./app/mozschemas_cli.py (-h | --help)
     Options:
     -h --help       Show this screen.
     -n namespace    List all docTypes under namespace
