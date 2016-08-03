@@ -2,12 +2,14 @@
 
 ### Layout of [mozilla-pipeline-schemas](https://github.com/mreid-moz/mozilla-pipeline-schemas/tree/common)
 1. One folder telemetry for namespace
+
 ```
 /telemetry
 ---- main.4.schema.json
 ---- common.4.schema.json
 ---- crash.1.schema.json
 ```
+
 2. Schema files named `docType.version.schema.json`
 3. [`git_checkout.py`](https://github.com/purukaushik/telemetry-schema-service/blob/master/app/git_checkout.py) pulls this repo down to a location specified on [`git_config.json`](https://github.com/purukaushik/telemetry-schema-service/blob/master/app/git_config.json#L4)
 
