@@ -87,6 +87,8 @@ def api_get_schema(namespace, docType, version):
     if len(request.args) != 0:
         if request.args.get('minify') == 'true':
             app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
+        elif request.args.get('inline') == 'true':
+            return jsonify(SCHEMAS_LOCAL_FILES_HELPER.get_schema_json(namespace, docType, version, inline=True))
         else:
             app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
     else:
