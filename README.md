@@ -89,10 +89,10 @@ docker run --log-driver=json-file -p 8080:8080 telemetry-schema-service &
 ## CLI version
 To run the schema retrieval as a CLI program from terminal, the following will be useful:
 
-    ./mozschemas_cli.py [(-n <namespace>)]
-    ./mozschemas_cli.py [(-n <namespace>  -d <doctype>)]
-    ./mozschemas_cli.py [(-n <namespace>  -d <doctype> -v <version>)]
-    ./mozschemas_cli.py (-h | --help)
+    ./app/mozschemas_cli.py [(-n <namespace>)]
+    ./app/mozschemas_cli.py [(-n <namespace>  -d <doctype>)]
+    ./app/mozschemas_cli.py [(-n <namespace>  -d <doctype> -v <version>)]
+    ./app/mozschemas_cli.py (-h | --help)
     Options:
     -h --help       Show this screen.
     -n namespace    List all docTypes under namespace
