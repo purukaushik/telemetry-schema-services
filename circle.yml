@@ -1,15 +1,43 @@
-test:
-  override:
-    - docker run -t -i purush/telemetry-schema-service nose2
 machine:
   services:
     - docker
+
 dependencies:
   override:
-    - docker build -t purush/telemetry-schema-service .
+    # generate version.json
+    - >
+        printf '{"commit":"%s","version":"%s","source":"https://github.com/%s/%s","build":"%s"}\n'
+        "$CIRCLE_SHA1"
+        "$CIRCLE_TAG"
+        "$CIRCLE_PROJECT_USERNAME"
+        "$CIRCLE_PROJECT_REPONAME"
+        "$CIRCLE_BUILD_URL"
+        > version.json
+
+    # build image
+    - docker build -t app:build .
+
+    # write the sha256 sum to an artifact to make image verification easier
+    - docker inspect --format '{{json .Config.Image}}' app:build | tr -d '"''"' | tee $CIRCLE_ARTIFACTS/docker-image-shasum256.txt
+
+test:
+  override:
+    - docker run -it app:build nose2
+
 deployment:
-  hub:
-    branch: testcases
+  hub_latest:
+    branch: master
     commands:
+      - "[ ! -z $DOCKERHUB_REPO ]"
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
-      - docker push purush/telemetry-schema-service
+      - "docker tag app:build ${DOCKERHUB_REPO}:latest"
+      - "docker push ${DOCKERHUB_REPO}:latest"
+
+  hub_releases:
+    # all tags
+    tag: /.*/
+    commands:
+      - "[ ! -z $DOCKERHUB_REPO ]"
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - "docker tag app:build ${DOCKERHUB_REPO}:${CIRCLE_TAG}"
+      - "docker push ${DOCKERHUB_REPO}:${CIRCLE_TAG}"
