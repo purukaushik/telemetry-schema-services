@@ -4,13 +4,13 @@
 <body>
 <h2>{{ listing }}<br/></h2>
 <ul style="list-style: none;">
-{% for name, schema, validate, minify in display_list %}
-    <li>{{ name }} <a href="{{ schema }}">schema</a>
-        {% if minify is not none %}
-            <a href="{{ minify }}">minify</a>
+{% for each_dict in display_list['doc_list'] %}
+    <li>{{ each_dict['document'] }} <a href="{{ each_dict['schema'] }}">schema</a>
+        {% if each_dict['minify'] is not none %}
+            <a href="{{ each_dict['minify'] }}">minify</a>
         {% endif %}
-        {% if validate is not none %}
-            <a href="{{ validate }}">validate</a><br/>
+        {% if each_dict['validate'] is not none %}
+            <a href="{{ each_dict['validate'] }}">validate</a><br/>
         {% endif %}
     </li>
 {% endfor %}

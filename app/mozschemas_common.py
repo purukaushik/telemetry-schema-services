@@ -67,7 +67,7 @@ class SchemasLocalFilesHelper:
             for file in files:
                 m = re.search('^[A-Za-z]*\.', file)
                 docType = m.group().replace('.', '')
-                lst_item = (docType, '/schema/' + namespace + '/' + docType, None, None)
+                lst_item = self.make(docType, '/schema/' + namespace + '/' + docType, None, None, None)
                 version_list.append(lst_item)
         else:
             for file in files:
@@ -77,11 +77,19 @@ class SchemasLocalFilesHelper:
                     version = m.group(1).replace('.','')
                     schema = '/schema/' + namespace + '/' + docType + '/' + version
                     minify = schema + '?minify=true'
-                    lst_item = (version, schema, '/validate/' + namespace + "/" + docType + "/" + version, minify)
-
+                    inline = schema + '?inline=true'
+                    lst_item = self.make(version, schema, '/validate/' + namespace + "/" + docType + "/" + version, minify, inline)
                     version_list.append(lst_item)
-        return version_list
+        return { "doc_list" : version_list }
 
+    def make(self, document, schema, validate, minify, inline):
+        return {
+            "document": document,
+            "schema" : schema,
+            "validate" : validate,
+            "minify" : minify,
+            "inline" : inline
+        }
 def checkout_branch(branch):
     config = get_config()
     config['branch'] = branch
