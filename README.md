@@ -37,14 +37,14 @@ The service is a Flask app that runs in a [Gunicorn](http://gunicorn.org/#quicks
     ```
 
 ## Building the service into a Docker image
-The app is built into a docker container and hence the only prerequisite is docker, installed and running on your system.
 
+The app is built into a docker container and hence the only prerequisite is docker, installed and running on your system.
 
 1. Clone the repository and cd in
 
     ```
     git clone https://github.com/purukaushik/telemetry-schema-service.git
-    cd telemetry-schema-service    
+    cd telemetry-schema-service
     ```
     
 2. Set git checkout path in 'os_dir' in [`git_config.json`](https://github.com/purukaushik/telemetry-schema-service/blob/master/app/git_config.json#L4)
