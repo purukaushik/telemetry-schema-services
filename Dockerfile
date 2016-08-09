@@ -1,22 +1,22 @@
-# ubuntu 16.04 xenial image
-FROM ubuntu
+# use base python
+FROM python:2.7-alpine
 
-# apt update it
-RUN apt-get update
-# get essentials
-RUN apt-get install -y tar git curl wget dialog net-tools build-essential python python-dev python-distribute python-pip
+# install deps
+RUN apk add --no-cache bash curl git mailcap tar wget
 
-# add project directory
-ADD . /telemetry-schema-service/
+# create app directory
+RUN mkdir -p /app/
+WORKDIR /app/
 
-# pip install requirements.txt
-RUN pip install -r /telemetry-schema-service/requirements.txt
+# install requirements
+COPY requirements.txt /app/
+RUN pip install --no-cache-dir --requirement requirements.txt
 
-# exposing 8080 for flask app
+# expose 8080 for flask app
 EXPOSE 8080
 
-# workdir
-WORKDIR /telemetry-schema-service/app
+# copy application
+COPY . /app/
 
-# run gunicorn
-CMD gunicorn -w 4 -b 0.0.0.0:8080 mozschemas_service:app
+# run start script
+CMD ["bin/start"]
