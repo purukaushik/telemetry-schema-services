@@ -50,6 +50,9 @@ def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
+@app.route('/', strict_slashes=False)
+def api_home():
+    return redirect('/schema/telemetry')
 
 @app.route('/__version__', strict_slashes=False)
 def api_version():
