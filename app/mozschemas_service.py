@@ -71,21 +71,33 @@ def api_get_file(path):
 @app.route('/schema/<namespace>', methods=['GET'], strict_slashes=False)
 def api_get_doctypes(namespace):
     try:
-        lst = SCHEMAS_LOCAL_FILES_HELPER.get_doctypes_versions(namespace, None)
+        document_list = SCHEMAS_LOCAL_FILES_HELPER.get_doctypes_versions(namespace, None)
     except OSError:
         return redirect(url_for('api_get_doctypes', namespace='telemetry'))
-    return render_template('links.html', display_list = lst, listing ='docTypes under ' + namespace)
+    if request.headers['Accept'] == 'application/json':
+        return jsonify(document_list)
+    else:
+        return render_template('links.html', display_list = document_list, listing ='docTypes under ' + namespace)
 
 @app.route('/schema/<namespace>/<docType>', methods = ['GET'], strict_slashes=False)
 def api_get_versions(namespace, docType):
-    lst = SCHEMAS_LOCAL_FILES_HELPER.get_doctypes_versions(namespace, docType)
-    return render_template('links.html', display_list = lst, listing ='versions of ' + docType)
+    document_list = SCHEMAS_LOCAL_FILES_HELPER.get_doctypes_versions(namespace, docType)
+    if request.headers['Accept'] == 'application/json':
+        return jsonify(document_list)
+    else:
+        return render_template('links.html', display_list = document_list, listing ='versions of ' + docType)
 
 @app.route('/schema/<namespace>/<docType>/<version>', methods = ['GET'])
 def api_get_schema(namespace, docType, version):
     # MINIFY
     if len(request.args) != 0:
-        if request.args.get('minify') == 'true':
+        if request.args.get('minify') == 'true' and request.args.get('inline') =='true':
+            app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
+            return jsonify(SCHEMAS_LOCAL_FILES_HELPER.get_schema_json(namespace, docType, version, inline=True))
+        elif request.args.get('inline') == 'true':
+            app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
+            return jsonify(SCHEMAS_LOCAL_FILES_HELPER.get_schema_json(namespace, docType, version, inline=True))
+        elif request.args.get('minify') == 'true':
             app.config['JSONIFY_PRETTYPRINT_REGULAR'] = False
         else:
             app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
