@@ -1,5 +1,7 @@
-# telemetry-schema-services
+# telemetry-schema-service
 [![CircleCI](https://circleci.com/gh/purukaushik/telemetry-schema-service.svg?style=svg)](https://circleci.com/gh/purukaushik/telemetry-schema-service)
+
+**Note** This repository is archived. More details can be found in the [mozilla-pipeline-schemas](https://github.com/mozilla-services/mozilla-pipeline-schemas) repository.
 
 Service API to retrieve telemetry schemas and validate them against incoming json.
 
